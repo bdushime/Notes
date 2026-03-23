@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <title>Notes App | Frontend Mentor</title>
+  </head>
+  <body>
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <img
+            src="./assets/images/logo.svg"
+            alt="Notes Logo"
+            class="sidebar-logo"
+          />
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#" class="nav-link active">
+                <img
+                  src="./assets/images/icon-home.svg"
+                  alt=""
+                  class="nav-icon"
+                />
+                <span>All Notes</span>
+                <img
+                  src="./assets/images/icon-chevron-right.svg"
+                  alt=""
+                  class="nav-chevron"
+                />
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <img
+                  src="./assets/images/icon-archive.svg"
+                  alt=""
+                  class="nav-icon"
+                />
+                <span>Archived Notes</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Tags</div>
+          <ul class="nav-list" id="sidebar-tags-list"></ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <div class="mobile-logo-header">
+          <img
+            src="./assets/images/logo.svg"
+            alt="Notes Logo"
+            class="mobile-logo"
+          />
+        </div>
+
+        <header class="top-header">
+          <h1 class="page-title">All Notes</h1>
+
+          <div class="header-actions">
+            <div class="search-bar">
+              <img
+                src="./assets/images/icon-search.svg"
+                alt=""
+                class="search-icon"
+              />
+              <input
+                type="text"
+                id="search-notes"
+                class="search-input"
+                placeholder="Search by title, content, or tags..."
+              />
+            </div>
+
+            <a href="settings.html" class="icon-btn settings-btn" aria-label="Open Settings">
+    <img src="./assets/images/icon-settings.svg" alt="Settings" />
+</a>
+          </div>
+        </header>
+
+        <div class="notes-layout">
+          <div class="notes-list-col">
+            <button class="btn btn-primary create-note-btn hidden-on-mobile">
+              <img
+                src="./assets/images/icon-plus.svg"
+                alt=""
+                class="plus-icon"
+              />
+              Create New Note
+            </button>
+
+            <div class="notes-scroll-area">
+              <div class="empty-state">
+                <p>
+                  You don't have any notes yet. Start a new note to capture your
+                  thoughts and ideas.
+                </p>
+              </div>
+            </div>
+
+            <button class="fab create-note-fab visible-on-mobile">
+              <img src="./assets/images/icon-plus.svg" alt="" />
+            </button>
+          </div>
+
+          <div class="note-editor-col">
+            <div class="editor-mobile-header">
+              <button class="icon-btn back-btn btn-text">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                Go Back
+              </button>
+              <div class="mobile-editor-actions">
+                <button class="icon-btn">
+                  <img src="./assets/images/icon-delete.svg" alt="" />
+                </button>
+                <button class="icon-btn">
+                  <img src="./assets/images/icon-archive.svg" alt="" />
+                </button>
+                <button class="btn btn-text btn-cancel">Cancel</button>
+                <button
+                  type="submit"
+                  form="note-form"
+                  class="btn btn-text btn-save"
+                >
+                  Save Note
+                </button>
+              </div>
+            </div>
+
+            <form id="note-form" class="editor-content">
+              <input
+                type="text"
+                class="editor-title-input"
+                placeholder="Enter a title..."
+                required
+              />
+              <div class="editor-metadata">
+                <div class="metadata-item">
+                  <img
+                    src="./assets/images/icon-tag.svg"
+                    alt=""
+                    class="meta-icon"
+                  />
+                  <label>Tags</label>
+                  <input
+                    type="text"
+                    placeholder="Add tags separated by commas"
+                  />
+                </div>
+                <div class="metadata-item">
+                  <img
+                    src="./assets/images/icon-clock.svg"
+                    alt=""
+                    class="meta-icon"
+                  />
+                  <span>Last edited</span>
+                  <span class="timestamp">Not yet saved</span>
+                </div>
+              </div>
+              <textarea
+                class="editor-textarea"
+                placeholder="Start typing your note here..."
+              ></textarea>
+            </form>
+            <div class="editor-actions">
+              <button type="submit" form="note-form" class="btn btn-primary">
+                Save Note
+              </button>
+              <button type="button" class="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+
+          <div class="note-meta-col" id="desktop-meta-actions">
+            <button class="btn meta-btn">
+              <img
+                src="./assets/images/icon-archive.svg"
+                alt=""
+                class="meta-icon"
+              />
+              Archive Note
+            </button>
+            <button class="btn meta-btn">
+              <img
+                src="./assets/images/icon-delete.svg"
+                alt=""
+                class="meta-icon"
+              />
+              Delete Note
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <nav class="mobile-nav">
+        <a href="#" class="mobile-nav-item active">
+          <img src="./assets/images/icon-home.svg" alt="" />
+          <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+          <img src="./assets/images/icon-search.svg" alt="" />
+          <span>Search</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+          <img src="./assets/images/icon-archive.svg" alt="" />
+          <span>Archived</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+          <img src="./assets/images/icon-tag.svg" alt="" />
+          <span>Tags</span>
+        </a>
+        <a href="#" class="mobile-nav-item">
+          <img src="./assets/images/icon-settings.svg" alt="" />
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <script type="module" src="./assets/js/main.js"></script>
+  </body>
+</html>

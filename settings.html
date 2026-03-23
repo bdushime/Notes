@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <title>Settings | Notes App</title>
+  </head>
+  <body>
+    <div class="app-container">
+      <main class="main-content">
+        <header class="top-header">
+          <div style="flex: 1">
+            <a href="index.html" class="back-btn">
+              <img
+                src="./assets/images/icon-arrow-left.svg"
+                alt=""
+                style="filter: invert(1)"
+              />
+              <span>Go Back</span>
+            </a>
+          </div>
+
+          <h1 class="page-title" style="flex: 2; text-align: center">
+            Settings
+          </h1>
+
+          <div style="flex: 1"></div>
+        </header>
+
+        <div
+          class="settings-scroll-area"
+          style="padding: 2rem; max-width: 800px"
+        >
+          <section class="settings-section" style="margin-bottom: 3rem">
+            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
+              Color Theme
+            </h2>
+            <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">
+              Choose your color theme:
+            </p>
+
+            <div
+              class="options-vertical"
+              style="display: flex; flex-direction: column; gap: 1rem"
+            >
+              <label class="option-item">
+                <input type="radio" name="color-theme" value="light" />
+                <div class="option-text">
+                  <strong>Light Mode</strong>
+                  <p>Pick a clean and classic light theme</p>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="color-theme" value="dark" checked />
+                <div class="option-text">
+                  <strong>Dark Mode</strong>
+                  <p>Select a sleek and modern dark theme</p>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="color-theme" value="system" />
+                <div class="option-text">
+                  <strong>System</strong>
+                  <p>Adapts to your device's theme</p>
+                </div>
+              </label>
+            </div>
+            <button
+              id="apply-theme-btn"
+              class="btn btn-primary"
+              style="margin-top: 1.5rem"
+            >
+              Apply Changes
+            </button>
+          </section>
+
+          <div class="nav-divider" style="margin: 2rem 0"></div>
+
+          <section class="settings-section">
+            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
+              Font Theme
+            </h2>
+            <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">
+              Choose your font theme:
+            </p>
+
+            <div
+              class="options-vertical"
+              style="display: flex; flex-direction: column; gap: 1rem"
+            >
+              <label class="option-item">
+                <input
+                  type="radio"
+                  name="font-theme"
+                  value="sans-serif"
+                  checked
+                />
+                <div class="option-text">
+                  <strong>Sans-serif</strong>
+                  <p>Clean and modern, easy to read.</p>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="font-theme" value="serif" />
+                <div class="option-text">
+                  <strong>Serif</strong>
+                  <p>Classic and elegant for a timeless feel.</p>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="font-theme" value="monospace" />
+                <div class="option-text">
+                  <strong>Monospace</strong>
+                  <p>Code-like, great for a technical vibe.</p>
+                </div>
+              </label>
+            </div>
+            <button
+              id="apply-font-btn"
+              class="btn btn-primary"
+              style="margin-top: 1.5rem"
+            >
+              Apply Changes
+            </button>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="./assets/js/main.js"></script>
+  </body>
+</html>
