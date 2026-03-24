@@ -9,6 +9,12 @@
       sizes="32x32"
       href="./assets/images/favicon-32x32.png"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./assets/css/styles.css" />
     <title>Notes App | Frontend Mentor</title>
   </head>
@@ -31,12 +37,14 @@
                   src="./assets/images/icon-home.svg"
                   alt=""
                   class="nav-icon"
+                  aria-hidden="true"
                 />
                 <span>All Notes</span>
                 <img
                   src="./assets/images/icon-chevron-right.svg"
                   alt=""
                   class="nav-chevron"
+                  aria-hidden="true"
                 />
               </a>
             </li>
@@ -46,6 +54,7 @@
                   src="./assets/images/icon-archive.svg"
                   alt=""
                   class="nav-icon"
+                  aria-hidden="true"
                 />
                 <span>Archived Notes</span>
               </a>
@@ -76,18 +85,24 @@
                 src="./assets/images/icon-search.svg"
                 alt=""
                 class="search-icon"
+                aria-hidden="true"
               />
               <input
                 type="text"
                 id="search-notes"
                 class="search-input"
                 placeholder="Search by title, content, or tags..."
+                aria-label="Search notes"
               />
             </div>
 
-            <a href="settings.html" class="icon-btn settings-btn" aria-label="Open Settings">
-    <img src="./assets/images/icon-settings.svg" alt="Settings" />
-</a>
+            <a
+              href="settings.html"
+              class="icon-btn settings-btn"
+              aria-label="Open Settings"
+            >
+              <img src="./assets/images/icon-settings.svg" alt="" aria-hidden="true" />
+            </a>
           </div>
         </header>
 
@@ -98,6 +113,7 @@
                 src="./assets/images/icon-plus.svg"
                 alt=""
                 class="plus-icon"
+                aria-hidden="true"
               />
               Create New Note
             </button>
@@ -111,23 +127,23 @@
               </div>
             </div>
 
-            <button class="fab create-note-fab visible-on-mobile">
-              <img src="./assets/images/icon-plus.svg" alt="" />
+            <button class="fab create-note-fab visible-on-mobile" aria-label="Create new note">
+              <img src="./assets/images/icon-plus.svg" alt="" aria-hidden="true" />
             </button>
           </div>
 
           <div class="note-editor-col">
             <div class="editor-mobile-header">
               <button class="icon-btn back-btn btn-text">
-                <img src="./assets/images/icon-arrow-left.svg" alt="" />
+                <img src="./assets/images/icon-arrow-left.svg" alt="" aria-hidden="true" />
                 Go Back
               </button>
               <div class="mobile-editor-actions">
-                <button class="icon-btn">
-                  <img src="./assets/images/icon-delete.svg" alt="" />
+                <button class="icon-btn" aria-label="Delete note">
+                  <img src="./assets/images/icon-delete.svg" alt="" aria-hidden="true" />
                 </button>
-                <button class="icon-btn">
-                  <img src="./assets/images/icon-archive.svg" alt="" />
+                <button class="icon-btn" aria-label="Archive note">
+                  <img src="./assets/images/icon-archive.svg" alt="" aria-hidden="true" />
                 </button>
                 <button class="btn btn-text btn-cancel">Cancel</button>
                 <button
@@ -146,16 +162,21 @@
                 class="editor-title-input"
                 placeholder="Enter a title..."
                 required
+                aria-label="Note title"
               />
+              <span id="title-error" class="error-message hidden">Title is required</span>
+              
               <div class="editor-metadata">
                 <div class="metadata-item">
                   <img
                     src="./assets/images/icon-tag.svg"
                     alt=""
                     class="meta-icon"
+                    aria-hidden="true"
                   />
-                  <label>Tags</label>
+                  <label for="note-tags-input">Tags</label>
                   <input
+                    id="note-tags-input"
                     type="text"
                     placeholder="Add tags separated by commas"
                   />
@@ -165,6 +186,7 @@
                     src="./assets/images/icon-clock.svg"
                     alt=""
                     class="meta-icon"
+                    aria-hidden="true"
                   />
                   <span>Last edited</span>
                   <span class="timestamp">Not yet saved</span>
@@ -173,9 +195,12 @@
               <textarea
                 class="editor-textarea"
                 placeholder="Start typing your note here..."
+                aria-label="Note content"
               ></textarea>
             </form>
             <div class="editor-actions">
+              <span id="draft-status" class="draft-status"></span>
+
               <button type="submit" form="note-form" class="btn btn-primary">
                 Save Note
               </button>
@@ -189,6 +214,7 @@
                 src="./assets/images/icon-archive.svg"
                 alt=""
                 class="meta-icon"
+                aria-hidden="true"
               />
               Archive Note
             </button>
@@ -197,6 +223,7 @@
                 src="./assets/images/icon-delete.svg"
                 alt=""
                 class="meta-icon"
+                aria-hidden="true"
               />
               Delete Note
             </button>
@@ -206,26 +233,49 @@
 
       <nav class="mobile-nav">
         <a href="#" class="mobile-nav-item active">
-          <img src="./assets/images/icon-home.svg" alt="" />
+          <img src="./assets/images/icon-home.svg" alt="" aria-hidden="true" />
           <span>Home</span>
         </a>
         <a href="#" class="mobile-nav-item">
-          <img src="./assets/images/icon-search.svg" alt="" />
+          <img src="./assets/images/icon-search.svg" alt="" aria-hidden="true" />
           <span>Search</span>
         </a>
         <a href="#" class="mobile-nav-item">
-          <img src="./assets/images/icon-archive.svg" alt="" />
+          <img src="./assets/images/icon-archive.svg" alt="" aria-hidden="true" />
           <span>Archived</span>
         </a>
         <a href="#" class="mobile-nav-item">
-          <img src="./assets/images/icon-tag.svg" alt="" />
+          <img src="./assets/images/icon-tag.svg" alt="" aria-hidden="true" />
           <span>Tags</span>
         </a>
         <a href="#" class="mobile-nav-item">
-          <img src="./assets/images/icon-settings.svg" alt="" />
+          <img src="./assets/images/icon-settings.svg" alt="" aria-hidden="true" />
           <span>Settings</span>
         </a>
       </nav>
+    </div>
+
+
+    <div id="delete-modal-overlay" 
+         class="modal-overlay hidden" 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="modal-title">
+      <div class="modal-card">
+        <div class="modal-body">
+          <div class="modal-icon-container">
+            <img id="modal-icon" src="" alt="" class="modal-delete-icon" aria-hidden="true" />
+          </div>
+          <div class="modal-text-content">
+            <h3 id="modal-title" class="modal-title"></h3>
+            <p id="modal-subtitle" class="modal-subtitle"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-cancel-btn" class="btn btn-secondary modal-btn">Cancel</button>
+          <button id="modal-confirm-delete-btn" class="modal-btn">Confirm</button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="./assets/js/main.js"></script>

@@ -9,12 +9,17 @@
       sizes="32x32"
       href="./assets/images/favicon-32x32.png"
     />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="./assets/css/styles.css" />
     <title>Settings | Notes App</title>
   </head>
   <body>
     <div class="app-container">
-      <main class="main-content">
+      <main class="main-content settings-page-content">
         <header class="top-header">
           <div style="flex: 1">
             <a href="index.html" class="back-btn">
@@ -36,7 +41,7 @@
 
         <div
           class="settings-scroll-area"
-          style="padding: 2rem; max-width: 800px"
+          style="padding: 2rem; max-width: 800px; overflow-y: auto; flex: 1;"
         >
           <section class="settings-section" style="margin-bottom: 3rem">
             <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
@@ -85,7 +90,7 @@
 
           <div class="nav-divider" style="margin: 2rem 0"></div>
 
-          <section class="settings-section">
+          <section class="settings-section" style="margin-bottom: 3rem">
             <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
               Font Theme
             </h2>
@@ -97,7 +102,7 @@
               class="options-vertical"
               style="display: flex; flex-direction: column; gap: 1rem"
             >
-              <label class="option-item">
+              <label class="option-item" style="font-family: 'Inter', sans-serif;">
                 <input
                   type="radio"
                   name="font-theme"
@@ -110,7 +115,7 @@
                 </div>
               </label>
 
-              <label class="option-item">
+              <label class="option-item" style="font-family: 'Noto Serif', serif;">
                 <input type="radio" name="font-theme" value="serif" />
                 <div class="option-text">
                   <strong>Serif</strong>
@@ -118,7 +123,7 @@
                 </div>
               </label>
 
-              <label class="option-item">
+              <label class="option-item" style="font-family: 'Source Code Pro', monospace;">
                 <input type="radio" name="font-theme" value="monospace" />
                 <div class="option-text">
                   <strong>Monospace</strong>
@@ -126,6 +131,7 @@
                 </div>
               </label>
             </div>
+            
             <button
               id="apply-font-btn"
               class="btn btn-primary"
@@ -134,6 +140,30 @@
               Apply Changes
             </button>
           </section>
+
+          <div class="nav-divider" style="margin: 2rem 0"></div>
+
+          <section class="settings-section" style="margin-bottom: 3rem">
+            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">Change Password</h2>
+            <form id="password-form" class="auth-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label">Old Password</label>
+                <input type="password" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" placeholder="At least 8 characters" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Save Password</button>
+            </form>
+          </section>
+
+          <div class="nav-divider" style="margin: 2rem 0"></div>
+
+          <button id="logout-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 2rem;">
+            <img src="./assets/images/icon-logout.svg" alt="" style="filter: invert(1); width: 20px;" />
+            <span>Logout</span>
+          </button>
         </div>
       </main>
     </div>

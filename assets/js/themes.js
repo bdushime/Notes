@@ -3,7 +3,7 @@ import * as storage from './storage.js';
 
 /**
  * 1. Initialization: Loads saved preferences from localStorage 
- * and applies them to the DOM as soon as the app starts.
+ * and applies them to the DOM as soon as any page starts.
  */
 export const initializeThemes = () => {
     const prefs = storage.loadPreferences();
@@ -27,21 +27,14 @@ export const applyTheme = (themeName) => {
 };
 
 /**
- * 3. Apply Font: Updates the CSS variable for the font family.
+ * 3. Apply Font Theme: Updates the <html> attribute. (Requirement F)
  * @param {string} fontName - 'sans-serif', 'serif', or 'monospace'
  */
 export const applyFont = (fontName) => {
-    const root = document.documentElement;
+    // DOM Manipulation: Set the data-font attribute on the root <html> element
+    document.documentElement.setAttribute('data-font', fontName);
     
-    // Logic to determine the font stack
-    let fontValue = "'Inter', sans-serif"; // Default
-    if (fontName === 'serif') fontValue = "'Noto Serif', serif";
-    else if (fontName === 'monospace') fontValue = "'Source Code Pro', monospace";
-
-    // Directly update the CSS Variable defined in your :root
-    root.style.setProperty('--ff-sans', fontValue);
-    
-    // Save choice to localStorage
+    // Persist choice to localStorage
     const prefs = storage.loadPreferences();
     prefs.font = fontName;
     storage.savePreferences(prefs);
@@ -51,36 +44,34 @@ export const applyFont = (fontName) => {
  * 4. Settings Listeners: Connects the 'Apply' buttons in settings.html to the functions above.
  */
 export const setupSettingsListeners = () => {
-    // Sync UI to match current preferences
+    // A. Sync UI State: Ensure radio buttons match current saved settings when page opens
     const prefs = storage.loadPreferences();
     
-    // Sync Theme Radio
     const activeThemeRadio = document.querySelector(`input[name="color-theme"][value="${prefs.theme || 'dark'}"]`);
     if (activeThemeRadio) activeThemeRadio.checked = true;
 
-    // Sync Font Radio
     const activeFontRadio = document.querySelector(`input[name="font-theme"][value="${prefs.font || 'sans-serif'}"]`);
     if (activeFontRadio) activeFontRadio.checked = true;
 
+    // B. Get Button Elements
     const applyThemeBtn = document.getElementById('apply-theme-btn');
     const applyFontBtn = document.getElementById('apply-font-btn');
 
-    // Listener for Color Theme
+    // C. Listener for Color Theme
     applyThemeBtn?.addEventListener('click', () => {
-        // Find which radio button is currently checked
         const selectedTheme = document.querySelector('input[name="color-theme"]:checked')?.value;
         if (selectedTheme) {
             applyTheme(selectedTheme);
-            alert('Theme updated successfully!');
+            alert('Color theme updated successfully!');
         }
     });
 
-    // Listener for Font Theme
+    // D. Listener for Font Theme (Requirement F)
     applyFontBtn?.addEventListener('click', () => {
         const selectedFont = document.querySelector('input[name="font-theme"]:checked')?.value;
         if (selectedFont) {
             applyFont(selectedFont);
-            alert('Font updated successfully!');
+            alert('Font theme updated successfully!');
         }
     });
 };

@@ -2,27 +2,33 @@ import * as ui from './ui.js';
 import * as noteManager from './noteManager.js';
 import * as themes from './themes.js';
 import * as storage from './storage.js';
+import * as auth from './auth.js';
 
 // --- Global App State ---
 let currentFilter = { type: 'all', value: null }; 
 let activeNoteId = null; 
 
-// --- 1. Initialization (The "Wake Up" Sequence) ---
+// Modal Memory
+let noteIdToProcess = null;
+let pendingAction = null; 
+let lastFocusedElement; 
 
+// --- DRAFT STATUS TIMER ---
+let draftTimer; 
+
+
+const loggedInUser = auth.checkAuth();
+console.log('Welcome, ', loggedInUser);
+
+// --- 1. Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
-    // A. IMMEDIATE THEME CHECK (Requirement F)
-    // This must happen before anything else to prevent the "white flash"
     themes.initializeThemes();
     
-    // B. PAGE-SPECIFIC LOGIC
-    // Check if we are on the settings page or the main index page
     const isSettingsPage = window.location.pathname.includes('settings.html');
 
     if (isSettingsPage) {
-        // Initialize Settings listeners only on the settings page
         themes.setupSettingsListeners();
     } else {
-        // Initialize Notes App logic only on the index page
         await noteManager.initializeNotes();
         updateUI();
         setupEventListeners();
@@ -30,14 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-/**
- * Re-evaluates state and updates the UI accordingly.
- */
 function updateUI() {
     let notesToDisplay = [];
     const titleElement = document.querySelector('.page-title');
     
-    if (!titleElement) return; // Guard clause for settings page
+    if (!titleElement) return;
 
     if (currentFilter.type === 'archived') {
         notesToDisplay = noteManager.getArchivedNotes();
@@ -55,65 +58,107 @@ function updateUI() {
 }
 
 // --- 2. Event Listener Orchestration ---
-
 function setupEventListeners() {
     const { titleInput, themeToggleBtn } = ui.elements;
     const notesListContainer = document.querySelector('.notes-scroll-area');
     const noteForm = document.querySelector('#note-form');
     const searchInput = document.querySelector('.search-input');
+    
+    const modalOverlay = document.getElementById('delete-modal-overlay');
+    const cancelModalBtn = document.getElementById('modal-cancel-btn');
+    const confirmModalBtn = document.getElementById('modal-confirm-delete-btn');
 
-    // Navigation
     document.querySelector('.sidebar')?.addEventListener('click', handleNavigation);
     document.querySelector('.mobile-nav')?.addEventListener('click', handleNavigation);
 
-    // Note Selection
     notesListContainer?.addEventListener('click', handleNoteSelection);
 
-    // Create Note
+    notesListContainer?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const noteItem = e.target.closest('.note-item');
+            if (noteItem) handleNoteSelection({ target: noteItem });
+        }
+    });
+
     ui.elements.createBtns.forEach(btn => btn.addEventListener('click', startNewNote));
 
-    // Title Validation
+    // UPDATED: Dynamic validation on input (Requirement E)
     titleInput?.addEventListener('input', () => {
         const isValid = titleInput.value.trim().length > 0;
         ui.toggleSaveButton(isValid);
+        if (isValid) ui.toggleTitleError(false); // Hide error while typing
     });
 
-    // Form Actions
+    // NEW: Validation on Blur (Requirement E)
+    titleInput?.addEventListener('blur', () => {
+        if (!titleInput.value.trim()) {
+            ui.toggleTitleError(true);
+        }
+    });
+
     noteForm?.addEventListener('submit', handleSaveNote);
     
-    // Header Settings Icon: Use this to Navigate to settings.html
     themeToggleBtn?.addEventListener('click', () => {
         window.location.href = 'settings.html';
     });
 
-    // Global Shortcuts
     window.addEventListener('keydown', handleKeyboardShortcuts);
 
-    // Cancel/Back
     ui.elements.btnCancel.forEach(btn => btn.addEventListener('click', handleCancel));
     if (ui.elements.backBtn) ui.elements.backBtn.addEventListener('click', handleCancel);
 
-    // Actions
     document.querySelectorAll('.mobile-editor-actions, #desktop-meta-actions')
             .forEach(w => w.addEventListener('click', handleNoteActions));
 
-    // Search
     if (searchInput) searchInput.addEventListener('input', handleSearch);
 
-    // Auto-Drafting
     const inputs = [ui.elements.titleInput, ui.elements.contentInput, ui.elements.tagsInput];
     inputs.forEach(input => {
         if(input) input.addEventListener('input', handleAutoDraft);
     });
+
+    cancelModalBtn?.addEventListener('click', closeModal);
+    
+    confirmModalBtn?.addEventListener('click', () => {
+        if (!noteIdToProcess) return;
+
+        if (pendingAction === 'delete') {
+            noteManager.deleteNote(noteIdToProcess);
+            ui.showSuccessMessage('Note Deleted Permanently');
+        } else if (pendingAction === 'archive') {
+            const isArchivedNow = noteManager.toggleArchive(noteIdToProcess);
+            ui.showSuccessMessage(isArchivedNow ? 'Note Archived' : 'Note Restored');
+        }
+
+        resetEditorAfterAction();
+        closeModal();
+    });
+
+    modalOverlay?.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+    });
+
+    modalOverlay?.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const focusable = modalOverlay.querySelectorAll('button');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    });
 }
 
 // --- 3. Helper Functions ---
-
 function handleNavigation(e) {
     const link = e.target.closest('.nav-link, .mobile-nav-item');
     if (!link) return;
     
-    // If user clicks "Settings" in the nav, go to settings page
     if (link.textContent.toLowerCase().includes('settings')) {
         window.location.href = 'settings.html';
         return;
@@ -169,7 +214,12 @@ async function handleSaveNote(e) {
     const tags = ui.elements.tagsInput.value; 
     const content = ui.elements.contentInput.value.trim();
 
-    if (!title) return;
+    // UPDATED: Prevent save and show error if title is empty (Requirement E)
+    if (!title) {
+        ui.toggleTitleError(true);
+        ui.elements.titleInput.focus();
+        return;
+    }
 
     const editingId = document.querySelector('#note-form').dataset.editingId;
 
@@ -191,26 +241,72 @@ function handleNoteActions(e) {
     const btn = e.target.closest('button');
     if (!btn || !activeNoteId) return;
 
-    const isDelete = btn.querySelector('img[src*="icon-delete"]') || btn.textContent.includes('Delete');
-    const isArchive = btn.querySelector('img[src*="icon-archive"]') || btn.textContent.includes('Archive');
+    const isDelete = btn.querySelector('img[src*="delete"]') || btn.textContent.includes('Delete');
+    const isArchive = btn.querySelector('img[src*="archive"]') || btn.textContent.includes('Archive') || btn.textContent.includes('Restore');
 
-    if (isDelete && confirm('Are you sure you want to delete this note?')) {
-        noteManager.deleteNote(activeNoteId);
-        resetEditorAfterAction();
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const modalIcon = document.getElementById('modal-icon');
+    const confirmBtn = document.getElementById('modal-confirm-delete-btn');
+    const overlay = document.getElementById('delete-modal-overlay');
+
+    if (!overlay || !modalTitle) return;
+
+    const note = noteManager.getNoteById(activeNoteId);
+    noteIdToProcess = activeNoteId;
+    lastFocusedElement = document.activeElement; 
+
+    if (isDelete) {
+        pendingAction = 'delete';
+        modalTitle.textContent = 'Delete Note';
+        modalSubtitle.textContent = 'Are you sure you want to permanently delete this note? This action cannot be undone.';
+        modalIcon.src = './assets/images/icon-delete.svg';
+        confirmBtn.textContent = 'Delete Note';
+        confirmBtn.className = 'modal-btn btn-danger'; 
+        overlay.classList.remove('hidden');
+        setTimeout(() => document.getElementById('modal-cancel-btn').focus(), 10);
     } else if (isArchive) {
-        const archived = noteManager.toggleArchive(activeNoteId);
-        ui.showSuccessMessage(archived ? 'Note Archived' : 'Note Unarchived');
-        resetEditorAfterAction();
+        pendingAction = 'archive';
+        const isCurrentlyArchived = note?.isArchived;
+        
+        modalTitle.textContent = isCurrentlyArchived ? 'Restore Note' : 'Archive Note';
+        modalSubtitle.textContent = isCurrentlyArchived 
+            ? 'Are you sure you want to restore this note? It will appear back in your All Notes section.' 
+            : 'Are you sure you want to archive this note? You can find it in the Archived Notes section and restore it anytime.';
+        
+        modalIcon.src = isCurrentlyArchived ? './assets/images/icon-restore.svg' : './assets/images/icon-archive.svg';
+        confirmBtn.textContent = isCurrentlyArchived ? 'Restore Note' : 'Archive Note';
+        confirmBtn.className = 'modal-btn btn-archive'; 
+        overlay.classList.remove('hidden');
+        setTimeout(() => document.getElementById('modal-cancel-btn').focus(), 10);
     }
 }
 
+function closeModal() {
+    document.getElementById('delete-modal-overlay').classList.add('hidden');
+    noteIdToProcess = null;
+    pendingAction = null;
+    if (lastFocusedElement) lastFocusedElement.focus();
+}
+
 function handleSearch(e) {
-    const results = noteManager.searchNotes(e.target.value);
-    ui.renderNotesList(results, activeNoteId);
+    const searchTerm = e.target.value;
+    const isArchivedView = currentFilter.type === 'archived';
+    
+    const results = noteManager.searchNotes(searchTerm, isArchivedView);
+    
+    ui.renderNotesList(results, activeNoteId, searchTerm);
 }
 
 function handleKeyboardShortcuts(e) {
-    if (e.key === 'Escape') handleCancel(e);
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('delete-modal-overlay');
+        if (overlay && !overlay.classList.contains('hidden')) {
+            closeModal();
+        } else {
+            handleCancel(e);
+        }
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         handleSaveNote(e);
@@ -220,11 +316,28 @@ function handleKeyboardShortcuts(e) {
 function handleAutoDraft() {
     const editingId = document.querySelector('#note-form')?.dataset.editingId;
     if (editingId) return;
+
+    const statusElement = document.getElementById('draft-status');
+
     storage.saveDraft({
         title: ui.elements.titleInput.value,
         content: ui.elements.contentInput.value,
         tags: ui.elements.tagsInput.value
     });
+
+    if (statusElement) {
+        statusElement.textContent = "Saving...";
+        statusElement.classList.add('visible');
+
+        clearTimeout(draftTimer);
+
+        draftTimer = setTimeout(() => {
+            statusElement.textContent = "Draft saved";
+            setTimeout(() => {
+                statusElement.classList.remove('visible');
+            }, 2000);
+        }, 800);
+    }
 }
 
 function recoverDraft() {
