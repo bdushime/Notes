@@ -42,7 +42,11 @@ function updateUI() {
     
     if (!titleElement) return;
 
-    if (currentFilter.type === 'archived') {
+    if (currentFilter.type === 'tags-menu') {
+        titleElement.textContent = 'Tags';
+        ui.renderMobileTagsMenu(noteManager.getAllUniqueTags());
+        return; // Skip rendering notes list
+    } else if (currentFilter.type === 'archived') {
         notesToDisplay = noteManager.getArchivedNotes();
         titleElement.textContent = 'Archived Notes';
     } else if (currentFilter.type === 'tag') {
@@ -71,7 +75,15 @@ function setupEventListeners() {
     document.querySelector('.sidebar')?.addEventListener('click', handleNavigation);
     document.querySelector('.mobile-nav')?.addEventListener('click', handleNavigation);
 
-    notesListContainer?.addEventListener('click', handleNoteSelection);
+    notesListContainer?.addEventListener('click', (e) => {
+        const tagItem = e.target.closest('[data-filter-tag]');
+        if (tagItem && currentFilter.type === 'tags-menu') {
+            currentFilter = { type: 'tag', value: tagItem.dataset.filterTag };
+            updateUI();
+            return;
+        }
+        handleNoteSelection(e);
+    });
 
     notesListContainer?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -176,6 +188,8 @@ function handleNavigation(e) {
         currentFilter = { type: 'archived', value: null };
     } else if (link.dataset.filterTag) {
         currentFilter = { type: 'tag', value: link.dataset.filterTag };
+    } else if (text.includes('tags')) {
+        currentFilter = { type: 'tags-menu', value: null };
     }
 
     activeNoteId = null;

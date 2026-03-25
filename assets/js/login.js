@@ -14,3 +14,19 @@ loginForm.addEventListener('submit', (e) => {
         alert(error.message);
     }
 });
+
+document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const input = btn.previousElementSibling;
+        const img = btn.querySelector('img');
+        
+        if (input && input.type === 'password') {
+            input.type = 'text';
+            if (img) { img.src = '../assets/images/icon-hide-password.svg'; img.alt = 'Hide Password'; }
+        } else if (input) {
+            input.type = 'password';
+            if (img) { img.src = '../assets/images/icon-show-password.svg'; img.alt = 'Show Password'; }
+        }
+    });
+});

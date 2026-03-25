@@ -156,6 +156,21 @@ export const renderTagsList = (tags) => {
     `).join('');
 };
 
+export const renderMobileTagsMenu = (tags) => {
+    const container = elements.notesListContainer;
+    if (!tags?.length) {
+        container.innerHTML = `<div class="empty-state"><p>No tags found.</p></div>`;
+        return;
+    }
+
+    container.innerHTML = tags.map(tag => `
+        <div class="note-item" style="display: flex; align-items: center; gap: 12px; padding: 1.25rem 1rem;" data-filter-tag="${tag}" tabindex="0" role="button">
+            <img src="./assets/images/icon-tag.svg" alt="" style="width: 24px; filter: invert(0.6);" />
+            <span style="font-weight: 600; font-size: 1.1rem; color: var(--text-color);">${tag}</span>
+        </div>
+    `).join('');
+};
+
 export const populateEditor = (note = null) => {
     const { titleInput, tagsInput, contentInput, timestampDisplay, noteForm } = elements;
     

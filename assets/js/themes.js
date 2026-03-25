@@ -1,5 +1,5 @@
-// themes.js
 import * as storage from './storage.js';
+import * as auth from './auth.js';
 
 /**
  * 1. Initialization: Loads saved preferences from localStorage 
@@ -74,4 +74,95 @@ export const setupSettingsListeners = () => {
             alert('Font theme updated successfully!');
         }
     });
+
+    // E. Layout Switcher for Master-Detail (Mobile/Tablet)
+    const layout = document.getElementById('settings-layout');
+    const backBtn = document.getElementById('settings-back-btn');
+    const titleEl = document.getElementById('settings-pane-title');
+    
+    document.querySelectorAll('.settings-menu-item[data-pane]').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.settings-menu-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            const targetPane = item.dataset.pane;
+            document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
+            const pane = document.getElementById('pane-' + targetPane);
+            if (pane) pane.classList.add('active');
+            
+            if (titleEl) titleEl.textContent = item.querySelector('span')?.textContent || 'Settings';
+            
+            if (window.innerWidth < 1024 && layout && backBtn) {
+                layout.classList.add('viewing-detail');
+                backBtn.style.display = 'flex';
+            }
+        });
+    });
+
+    // Back button returns to menu on mobile
+    if (backBtn && layout) {
+        backBtn.addEventListener('click', () => {
+            layout.classList.remove('viewing-detail');
+            backBtn.style.display = 'none';
+        });
+    }
+
+    // F. Setup password show/hide toggles
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const input = btn.previousElementSibling;
+            const img = btn.querySelector('img');
+            
+            if (input && input.type === 'password') {
+                input.type = 'text';
+                if (img) { img.src = './assets/images/icon-hide-password.svg'; img.alt = 'Hide Password'; }
+            } else if (input) {
+                input.type = 'password';
+                if (img) { img.src = './assets/images/icon-show-password.svg'; img.alt = 'Show Password'; }
+            }
+        });
+    });
+
+    // G. Logout Menu Button
+    const logoutBtn = document.getElementById('logout-menu-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', auth.logout);
+    }
+
+    // H. Password Form Validation & Submission
+    const passwordForm = document.getElementById('password-form');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const oldPass = document.getElementById('old-password').value;
+            const newPass = document.getElementById('new-password').value;
+            const confirmPass = document.getElementById('confirm-password');
+            
+            if (newPass !== confirmPass.value) {
+                confirmPass.setCustomValidity('Passwords do not match');
+                confirmPass.reportValidity();
+                return;
+            }
+            
+            confirmPass.setCustomValidity(''); // Clear error
+            
+            try {
+                const currentUserEmail = auth.checkAuth();
+                if (currentUserEmail) {
+                    auth.changePassword(currentUserEmail, oldPass, newPass);
+                    alert('Password successfully updated!');
+                    passwordForm.reset(); // clear fields naturally
+                }
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        // Clear mismatch validation when user edits the confirm field
+        document.getElementById('confirm-password')?.addEventListener('input', (e) => {
+            e.target.setCustomValidity('');
+        });
+    }
 };

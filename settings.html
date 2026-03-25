@@ -19,153 +19,197 @@
   </head>
   <body>
     <div class="app-container">
-      <main class="main-content settings-page-content">
-        <header class="top-header">
-          <div style="flex: 1">
-            <a href="index.html" class="back-btn">
-              <img
-                src="./assets/images/icon-arrow-left.svg"
-                alt=""
-                style="filter: invert(1)"
-              />
-              <span>Go Back</span>
-            </a>
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <img src="./assets/images/logo.svg" alt="Notes Logo" class="sidebar-logo" />
+        </div>
+        <nav class="sidebar-nav">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="index.html" class="nav-link">
+                <img src="./assets/images/icon-home.svg" alt="" class="nav-icon" aria-hidden="true" />
+                <span>All Notes</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="index.html?filter=archived" class="nav-link">
+                <img src="./assets/images/icon-archive.svg" alt="" class="nav-icon" aria-hidden="true" />
+                <span>Archived Notes</span>
+              </a>
+            </li>
+          </ul>
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Tags</div>
+          <ul class="nav-list" id="sidebar-tags-list"></ul>
+        </nav>
+      </aside>
+
+      <main class="main-content settings-page-content" style="padding: 0; max-width: none;">
+        <div class="mobile-logo-header hidden-on-desktop visible-on-mobile">
+          <img src="./assets/images/logo.svg" alt="Notes Logo" class="mobile-logo" />
+        </div>
+
+        <div class="settings-layout-wrapper" id="settings-layout">
+          
+          <!-- MASTER MENU (Left) -->
+          <div class="settings-menu-col">
+            <header class="top-header" style="border-radius:0; border:none; border-bottom:1px solid var(--border-color)">
+              <h1 class="page-title">Settings</h1>
+            </header>
+            <div class="settings-menu-list">
+              <div class="settings-menu-item active" data-pane="color-theme">
+                <img src="./assets/images/icon-sun.svg" alt="" class="settings-menu-icon" aria-hidden="true" />
+                <span>Color Theme</span>
+              </div>
+              <div class="settings-menu-item" data-pane="font-theme">
+                <img src="./assets/images/icon-font.svg" alt="" class="settings-menu-icon" aria-hidden="true" />
+                <span>Font Theme</span>
+              </div>
+              <div class="settings-menu-item" data-pane="password">
+                <img src="./assets/images/icon-lock.svg" alt="" class="settings-menu-icon" aria-hidden="true" />
+                <span>Change Password</span>
+              </div>
+              <div class="nav-divider" style="margin: 1rem 0"></div>
+              <div class="settings-menu-item" id="logout-menu-btn">
+                <img src="./assets/images/icon-logout.svg" alt="" class="settings-menu-icon" aria-hidden="true" />
+                <span>Logout</span>
+              </div>
+            </div>
           </div>
 
-          <h1 class="page-title" style="flex: 2; text-align: center">
-            Settings
-          </h1>
-
-          <div style="flex: 1"></div>
-        </header>
-
-        <div
-          class="settings-scroll-area"
-          style="padding: 2rem; max-width: 800px; overflow-y: auto; flex: 1;"
-        >
-          <section class="settings-section" style="margin-bottom: 3rem">
-            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
-              Color Theme
-            </h2>
-            <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">
-              Choose your color theme:
-            </p>
-
-            <div
-              class="options-vertical"
-              style="display: flex; flex-direction: column; gap: 1rem"
-            >
-              <label class="option-item">
-                <input type="radio" name="color-theme" value="light" />
-                <div class="option-text">
-                  <strong>Light Mode</strong>
-                  <p>Pick a clean and classic light theme</p>
-                </div>
-              </label>
-
-              <label class="option-item">
-                <input type="radio" name="color-theme" value="dark" checked />
-                <div class="option-text">
-                  <strong>Dark Mode</strong>
-                  <p>Select a sleek and modern dark theme</p>
-                </div>
-              </label>
-
-              <label class="option-item">
-                <input type="radio" name="color-theme" value="system" />
-                <div class="option-text">
-                  <strong>System</strong>
-                  <p>Adapts to your device's theme</p>
-                </div>
-              </label>
-            </div>
-            <button
-              id="apply-theme-btn"
-              class="btn btn-primary"
-              style="margin-top: 1.5rem"
-            >
-              Apply Changes
-            </button>
-          </section>
-
-          <div class="nav-divider" style="margin: 2rem 0"></div>
-
-          <section class="settings-section" style="margin-bottom: 3rem">
-            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">
-              Font Theme
-            </h2>
-            <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">
-              Choose your font theme:
-            </p>
-
-            <div
-              class="options-vertical"
-              style="display: flex; flex-direction: column; gap: 1rem"
-            >
-              <label class="option-item" style="font-family: 'Inter', sans-serif;">
-                <input
-                  type="radio"
-                  name="font-theme"
-                  value="sans-serif"
-                  checked
-                />
-                <div class="option-text">
-                  <strong>Sans-serif</strong>
-                  <p>Clean and modern, easy to read.</p>
-                </div>
-              </label>
-
-              <label class="option-item" style="font-family: 'Noto Serif', serif;">
-                <input type="radio" name="font-theme" value="serif" />
-                <div class="option-text">
-                  <strong>Serif</strong>
-                  <p>Classic and elegant for a timeless feel.</p>
-                </div>
-              </label>
-
-              <label class="option-item" style="font-family: 'Source Code Pro', monospace;">
-                <input type="radio" name="font-theme" value="monospace" />
-                <div class="option-text">
-                  <strong>Monospace</strong>
-                  <p>Code-like, great for a technical vibe.</p>
-                </div>
-              </label>
-            </div>
+          <!-- DETAIL PANE (Right) -->
+          <div class="settings-detail-col">
+            <header class="settings-detail-header">
+              <button class="icon-btn back-btn" id="settings-back-btn" style="display: none; align-items: center; gap: 8px;">
+                <img src="./assets/images/icon-arrow-left.svg" alt="" style="filter: invert(1)" />
+                Settings
+              </button>
+              <h2 class="settings-detail-title" id="settings-pane-title">Color Theme</h2>
+            </header>
             
-            <button
-              id="apply-font-btn"
-              class="btn btn-primary"
-              style="margin-top: 1.5rem"
-            >
-              Apply Changes
-            </button>
-          </section>
-
-          <div class="nav-divider" style="margin: 2rem 0"></div>
-
-          <section class="settings-section" style="margin-bottom: 3rem">
-            <h2 style="font-size: var(--fs-2); margin-bottom: 1rem">Change Password</h2>
-            <form id="password-form" class="auth-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
-              <div class="form-group">
-                <label class="form-label">Old Password</label>
-                <input type="password" class="form-input" required />
+            <div class="settings-scroll-area">
+              
+              <!-- Color Theme Pane -->
+              <div class="settings-pane active" id="pane-color-theme">
+                <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">Choose your color theme:</p>
+                <div class="options-vertical" style="display: flex; flex-direction: column; gap: 1rem">
+                  <label class="option-item">
+                    <input type="radio" name="color-theme" value="light" />
+                    <div class="option-text">
+                      <strong>Light Mode</strong><p>Pick a clean and classic light theme</p>
+                    </div>
+                  </label>
+                  <label class="option-item">
+                    <input type="radio" name="color-theme" value="dark" checked />
+                    <div class="option-text">
+                      <strong>Dark Mode</strong><p>Select a sleek and modern dark theme</p>
+                    </div>
+                  </label>
+                  <label class="option-item">
+                    <input type="radio" name="color-theme" value="system" />
+                    <div class="option-text">
+                      <strong>System</strong><p>Adapts to your device's theme</p>
+                    </div>
+                  </label>
+                </div>
+                <button id="apply-theme-btn" class="btn btn-primary" style="margin-top: 1.5rem; float: right;">Apply Changes</button>
               </div>
-              <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" class="form-input" placeholder="At least 8 characters" required />
+
+              <!-- Font Theme Pane -->
+              <div class="settings-pane" id="pane-font-theme">
+                <p style="color: var(--clr-neutral-400); margin-bottom: 1.5rem">Choose your font theme:</p>
+                <div class="options-vertical" style="display: flex; flex-direction: column; gap: 1rem">
+                  <label class="option-item" style="font-family: 'Inter', sans-serif;">
+                    <input type="radio" name="font-theme" value="sans-serif" checked />
+                    <div class="option-text">
+                      <strong>Sans-serif</strong><p>Clean and modern, easy to read.</p>
+                    </div>
+                  </label>
+                  <label class="option-item" style="font-family: 'Noto Serif', serif;">
+                    <input type="radio" name="font-theme" value="serif" />
+                    <div class="option-text">
+                      <strong>Serif</strong><p>Classic and elegant for a timeless feel.</p>
+                    </div>
+                  </label>
+                  <label class="option-item" style="font-family: 'Source Code Pro', monospace;">
+                    <input type="radio" name="font-theme" value="monospace" />
+                    <div class="option-text">
+                      <strong>Monospace</strong><p>Code-like, great for a technical vibe.</p>
+                    </div>
+                  </label>
+                </div>
+                <button id="apply-font-btn" class="btn btn-primary" style="margin-top: 1.5rem; float: right;">Apply Changes</button>
               </div>
-              <button type="submit" class="btn btn-primary">Save Password</button>
-            </form>
-          </section>
 
-          <div class="nav-divider" style="margin: 2rem 0"></div>
+              <!-- Password Pane -->
+              <div class="settings-pane" id="pane-password">
+                <form id="password-form" class="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="old-password">Old Password</label>
+                    <div class="password-input-wrapper">
+                      <input type="password" id="old-password" class="form-input" required />
+                      <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <img src="./assets/images/icon-show-password.svg" alt="Show Password">
+                      </button>
+                    </div>
+                  </div>
 
-          <button id="logout-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 2rem;">
-            <img src="./assets/images/icon-logout.svg" alt="" style="filter: invert(1); width: 20px;" />
-            <span>Logout</span>
-          </button>
+                  <div class="form-group">
+                    <label class="form-label" for="new-password">New Password</label>
+                    <div class="password-input-wrapper">
+                      <input type="password" id="new-password" class="form-input" minlength="8" required />
+                      <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <img src="./assets/images/icon-show-password.svg" alt="Show Password">
+                      </button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--clr-neutral-500); font-size: 0.75rem;">
+                      <img src="./assets/images/icon-info.svg" alt="" style="width: 14px; filter: invert(0.5);" />
+                      <span>At least 8 characters</span>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="confirm-password">Confirm New Password</label>
+                    <div class="password-input-wrapper">
+                      <input type="password" id="confirm-password" class="form-input" minlength="8" required />
+                      <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <img src="./assets/images/icon-show-password.svg" alt="Show Password">
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" style="align-self: flex-end; margin-top: 1rem; padding: 12px 24px;">Save Password</button>
+                </form>
+              </div>
+
+            </div>
+          </div>
         </div>
       </main>
+
+      <nav class="mobile-nav">
+        <a href="index.html" class="mobile-nav-item">
+          <img src="./assets/images/icon-home.svg" alt="" aria-hidden="true" />
+          <span>Home</span>
+        </a>
+        <a href="index.html?search=true" class="mobile-nav-item">
+          <img src="./assets/images/icon-search.svg" alt="" aria-hidden="true" />
+          <span>Search</span>
+        </a>
+        <a href="index.html?filter=archived" class="mobile-nav-item">
+          <img src="./assets/images/icon-archive.svg" alt="" aria-hidden="true" />
+          <span>Archived</span>
+        </a>
+        <a href="index.html?view=tags" class="mobile-nav-item">
+          <img src="./assets/images/icon-tag.svg" alt="" aria-hidden="true" />
+          <span>Tags</span>
+        </a>
+        <a href="settings.html" class="mobile-nav-item active">
+          <img src="./assets/images/icon-settings.svg" alt="" aria-hidden="true" />
+          <span>Settings</span>
+        </a>
+      </nav>
     </div>
 
     <script type="module" src="./assets/js/main.js"></script>

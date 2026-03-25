@@ -36,11 +36,26 @@ export const loginUser = (email, password) => {
 };
 
 /**
+ * Change Password
+ */
+export const changePassword = (email, oldPassword, newPassword) => {
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    const userIndex = users.findIndex(u => u.email === email && u.password === oldPassword);
+
+    if (userIndex === -1) {
+        throw new Error('Incorrect old password.');
+    }
+
+    users[userIndex].password = newPassword;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+};
+
+/**
  * Logout
  */
 export const logout = () => {
     sessionStorage.removeItem(SESSION_KEY);
-    window.location.href = 'login.html';
+    window.location.href = './auth/login.html';
 };
 
 /**
@@ -49,7 +64,7 @@ export const logout = () => {
 export const checkAuth = () => {
     const user = sessionStorage.getItem(SESSION_KEY);
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = './auth/login.html';
     }
     return user;
 };
