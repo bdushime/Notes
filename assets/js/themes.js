@@ -1,50 +1,53 @@
+/**
+ * @fileoverview Manages application-wide user interface preferences.
+ * Handles the application of CSS themes, fonts, and the interactivity
+ * of the Settings master-detail page layout.
+ */
+
 import * as storage from './storage.js';
 import * as auth from './auth.js';
 
 /**
- * 1. Initialization: Loads saved preferences from localStorage 
- * and applies them to the DOM as soon as any page starts.
+ * Executes immediately on page load to apply cached user CSS preferences.
  */
 export const initializeThemes = () => {
     const prefs = storage.loadPreferences();
-    // Default to 'dark' and 'sans-serif' if no preferences exist
+
     applyTheme(prefs.theme || 'dark');
     applyFont(prefs.font || 'sans-serif');
 };
 
 /**
- * 2. Apply Color Theme: Updates the <html> attribute.
- * @param {string} themeName - 'light', 'dark', or 'system'
+ * Mutates the root HTML element's data attribute to trigger global CSS theme repaints.
+ * @param {string} themeName - The targeted theme identifier ('light', 'dark').
  */
 export const applyTheme = (themeName) => {
-    // DOM Manipulation: Set the data-theme attribute on the root <html> element
+
     document.documentElement.setAttribute('data-theme', themeName);
 
-    // Save choice to localStorage so it persists after refresh
     const prefs = storage.loadPreferences();
     prefs.theme = themeName;
     storage.savePreferences(prefs);
 };
 
 /**
- * 3. Apply Font Theme: Updates the <html> attribute. (Requirement F)
- * @param {string} fontName - 'sans-serif', 'serif', or 'monospace'
+ * Mutates the root HTML element's data attribute to trigger global CSS typography swaps.
+ * @param {string} fontName - The targeted font identifier (e.g., 'sans-serif').
  */
 export const applyFont = (fontName) => {
-    // DOM Manipulation: Set the data-font attribute on the root <html> element
+
     document.documentElement.setAttribute('data-font', fontName);
-    
-    // Persist choice to localStorage
+
     const prefs = storage.loadPreferences();
     prefs.font = fontName;
     storage.savePreferences(prefs);
 };
 
 /**
- * 4. Settings Listeners: Connects the 'Apply' buttons in settings.html to the functions above.
+ * Binds all interactive event handlers explicitly for the Settings page DOM controls.
  */
 export const setupSettingsListeners = () => {
-    // A. Sync UI State: Ensure radio buttons match current saved settings when page opens
+
     const prefs = storage.loadPreferences();
     
     const activeThemeRadio = document.querySelector(`input[name="color-theme"][value="${prefs.theme || 'dark'}"]`);
@@ -53,11 +56,9 @@ export const setupSettingsListeners = () => {
     const activeFontRadio = document.querySelector(`input[name="font-theme"][value="${prefs.font || 'sans-serif'}"]`);
     if (activeFontRadio) activeFontRadio.checked = true;
 
-    // B. Get Button Elements
     const applyThemeBtn = document.getElementById('apply-theme-btn');
     const applyFontBtn = document.getElementById('apply-font-btn');
 
-    // C. Listener for Color Theme
     applyThemeBtn?.addEventListener('click', () => {
         const selectedTheme = document.querySelector('input[name="color-theme"]:checked')?.value;
         if (selectedTheme) {
@@ -66,7 +67,6 @@ export const setupSettingsListeners = () => {
         }
     });
 
-    // D. Listener for Font Theme (Requirement F)
     applyFontBtn?.addEventListener('click', () => {
         const selectedFont = document.querySelector('input[name="font-theme"]:checked')?.value;
         if (selectedFont) {
@@ -75,7 +75,6 @@ export const setupSettingsListeners = () => {
         }
     });
 
-    // E. Layout Switcher for Master-Detail (Mobile/Tablet)
     const layout = document.getElementById('settings-layout');
     const backBtn = document.getElementById('settings-back-btn');
     const titleEl = document.getElementById('settings-pane-title');
@@ -99,7 +98,6 @@ export const setupSettingsListeners = () => {
         });
     });
 
-    // Back button returns to menu on mobile
     if (backBtn && layout) {
         backBtn.addEventListener('click', () => {
             layout.classList.remove('viewing-detail');
@@ -107,7 +105,6 @@ export const setupSettingsListeners = () => {
         });
     }
 
-    // F. Setup password show/hide toggles
     document.querySelectorAll('.password-toggle').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -124,13 +121,11 @@ export const setupSettingsListeners = () => {
         });
     });
 
-    // G. Logout Menu Button
     const logoutBtn = document.getElementById('logout-menu-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', auth.logout);
     }
 
-    // H. Password Form Validation & Submission
     const passwordForm = document.getElementById('password-form');
     if (passwordForm) {
         passwordForm.addEventListener('submit', (e) => {
@@ -160,7 +155,6 @@ export const setupSettingsListeners = () => {
             }
         });
 
-        // Clear mismatch validation when user edits the confirm field
         document.getElementById('confirm-password')?.addEventListener('input', (e) => {
             e.target.setCustomValidity('');
         });

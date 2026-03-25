@@ -1,13 +1,14 @@
-// storage.js
+/**
+ * @fileoverview Centralizes Web Storage API interactions.
+ * Controls data persistence for Notes, User Preferences, and Active Session Drafts.
+ */
 
 const STORAGE_KEY_NOTES = 'notesapp_notes';
 const STORAGE_KEY_PREFS = 'notesapp_prefs';
 const SESSION_KEY_DRAFT = 'notesapp_draft';
 
 /**
- * Loads notes from localStorage. If they don't exist, fetches the defaults
- * from data.json and populates localStorage.
- * Returns a Promise resolving to an array of notes.
+ * Fetches notes from localStorage or downloads starter JSON data as a fallback.
  */
 export const loadNotes = async () => {
     const rawData = localStorage.getItem(STORAGE_KEY_NOTES);
@@ -15,13 +16,11 @@ export const loadNotes = async () => {
         return JSON.parse(rawData);
     }
     
-    // Fallback: load defaults from data.json
     try {
         const response = await fetch('./data.json');
         if (!response.ok) throw new Error('Failed to fetch default notes');
         const data = await response.json();
         
-        // Give each imported note a unique ID since it's missing in the raw JSON
         const notesWithIds = data.notes.map(note => ({
              ...note,
              id: generateId()
@@ -31,12 +30,12 @@ export const loadNotes = async () => {
         return notesWithIds;
     } catch (e) {
         console.error('Error loading default notes:', e);
-        return []; // Return empty array if all fails
+        return [];
     }
 };
 
 /**
- * Saves exactly the provided notes array to localStorage.
+ * Serializes and overwrites the active notes array into localStorage.
  */
 export const saveNotes = (notes) => {
     try {
@@ -48,8 +47,7 @@ export const saveNotes = (notes) => {
 };
 
 /**
- * Loads user preferences (themes, fonts)
- * Returns object: { theme: 'dark', font: 'sans-serif' }
+ * Extracts the user's saved UI theme configurations.
  */
 export const loadPreferences = () => {
     const defaultPrefs = { theme: 'dark', font: 'sans-serif' };
@@ -61,29 +59,37 @@ export const loadPreferences = () => {
 };
 
 /**
- * Saves preferences
+ * Persists the user's selected UI theme configurations.
  */
 export const savePreferences = (prefs) => {
     localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(prefs));
 };
 
 /**
- * Auto-Saves draft to sessionStorage
+ * Backs up unsaved active text editor state into the session cache.
  */
 export const saveDraft = (draft) => {
     sessionStorage.setItem(SESSION_KEY_DRAFT, JSON.stringify(draft));
 };
 
+/**
+ * Recovers unsaved text editor states from previous session crashes.
+ */
 export const loadDraft = () => {
     const draft = sessionStorage.getItem(SESSION_KEY_DRAFT);
     return draft ? JSON.parse(draft) : null;
 };
 
+/**
+ * Flushes active draft memory.
+ */
 export const clearDraft = () => {
     sessionStorage.removeItem(SESSION_KEY_DRAFT);
 };
 
-// Simple ID Generator helper
+/**
+ * Utility to generate unique alphanumeric IDs.
+ */
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
