@@ -1,16 +1,17 @@
-// --- User "Database" Keys ---
+/**
+ * @fileoverview Simulates a user database using Web Storage.
+ * Handles user registration, login, session management, and password updates.
+ */
+
 const USERS_KEY = 'notes_app_users';
 const SESSION_KEY = 'notes_app_logged_in_user';
 
-// --- Core Auth Functions ---
-
 /**
- * Register a new user
+ * Registers a new user into the local database if the email is available.
  */
 export const registerUser = (email, password) => {
     const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
     
-    // Check if user already exists
     if (users.find(u => u.email === email)) {
         throw new Error('User already exists with this email.');
     }
@@ -20,7 +21,7 @@ export const registerUser = (email, password) => {
 };
 
 /**
- * Login a user
+ * Validates user credentials and initiates a browser session.
  */
 export const loginUser = (email, password) => {
     const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
@@ -30,13 +31,12 @@ export const loginUser = (email, password) => {
         throw new Error('Invalid email or password.');
     }
 
-    // Store the email in sessionStorage to keep them logged in for this tab
     sessionStorage.setItem(SESSION_KEY, email);
     return user;
 };
 
 /**
- * Change Password
+ * Verifies the old password and updates it with the new password.
  */
 export const changePassword = (email, oldPassword, newPassword) => {
     const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
@@ -51,7 +51,7 @@ export const changePassword = (email, oldPassword, newPassword) => {
 };
 
 /**
- * Logout
+ * Destroys the active user session and returns to login.
  */
 export const logout = () => {
     sessionStorage.removeItem(SESSION_KEY);
@@ -59,7 +59,7 @@ export const logout = () => {
 };
 
 /**
- * Guard: Check if user is logged in (used on index.html)
+ * Enforces authentication state, redirecting unauthorized users.
  */
 export const checkAuth = () => {
     const user = sessionStorage.getItem(SESSION_KEY);

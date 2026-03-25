@@ -1,26 +1,26 @@
+/**
+ * @fileoverview Main architectural controller logic.
+ * Binds DOM Events dynamically onto application state variables and forwards logical instructions.
+ */
+
 import * as ui from './ui.js';
 import * as noteManager from './noteManager.js';
 import * as themes from './themes.js';
 import * as storage from './storage.js';
 import * as auth from './auth.js';
 
-// --- Global App State ---
 let currentFilter = { type: 'all', value: null }; 
 let activeNoteId = null; 
 
-// Modal Memory
 let noteIdToProcess = null;
 let pendingAction = null; 
 let lastFocusedElement; 
 
-// --- DRAFT STATUS TIMER ---
 let draftTimer; 
-
 
 const loggedInUser = auth.checkAuth();
 console.log('Welcome, ', loggedInUser);
 
-// --- 1. Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
     themes.initializeThemes();
     
@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+/**
+ * Syncs the visual viewport dynamically with the active logic `currentFilter` parameter constraints.
+ */
 function updateUI() {
     let notesToDisplay = [];
     const titleElement = document.querySelector('.page-title');
@@ -45,7 +48,7 @@ function updateUI() {
     if (currentFilter.type === 'tags-menu') {
         titleElement.textContent = 'Tags';
         ui.renderMobileTagsMenu(noteManager.getAllUniqueTags());
-        return; // Skip rendering notes list
+        return; 
     } else if (currentFilter.type === 'archived') {
         notesToDisplay = noteManager.getArchivedNotes();
         titleElement.textContent = 'Archived Notes';
@@ -61,7 +64,9 @@ function updateUI() {
     ui.renderTagsList(noteManager.getAllUniqueTags());
 }
 
-// --- 2. Event Listener Orchestration ---
+/**
+ * Dispatches root layer DOM interaction binding instructions for global layout elements gracefully.
+ */
 function setupEventListeners() {
     const { titleInput, themeToggleBtn } = ui.elements;
     const notesListContainer = document.querySelector('.notes-scroll-area');
@@ -94,14 +99,12 @@ function setupEventListeners() {
 
     ui.elements.createBtns.forEach(btn => btn.addEventListener('click', startNewNote));
 
-    // UPDATED: Dynamic validation on input (Requirement E)
     titleInput?.addEventListener('input', () => {
         const isValid = titleInput.value.trim().length > 0;
         ui.toggleSaveButton(isValid);
         if (isValid) ui.toggleTitleError(false); // Hide error while typing
     });
 
-    // NEW: Validation on Blur (Requirement E)
     titleInput?.addEventListener('blur', () => {
         if (!titleInput.value.trim()) {
             ui.toggleTitleError(true);
@@ -166,7 +169,9 @@ function setupEventListeners() {
     });
 }
 
-// --- 3. Helper Functions ---
+/**
+ * Traps sidebar anchor interactions forcing single-page dynamic routing structurally.
+ */
 function handleNavigation(e) {
     const link = e.target.closest('.nav-link, .mobile-nav-item');
     if (!link) return;
@@ -198,6 +203,9 @@ function handleNavigation(e) {
     updateUI();
 }
 
+/**
+ * Maps the UI extraction logic payload sequence actively whenever selecting items securely.
+ */
 function handleNoteSelection(e) {
     const noteItem = e.target.closest('.note-item');
     if (!noteItem) return;
@@ -213,6 +221,9 @@ function handleNoteSelection(e) {
     }
 }
 
+/**
+ * Empties DOM nodes actively forcing note creation procedures globally.
+ */
 function startNewNote() {
     activeNoteId = null;
     ui.populateEditor(null);
@@ -222,13 +233,15 @@ function startNewNote() {
     ui.elements.titleInput.focus();
 }
 
+/**
+ * Harvests values sequentially and passes storage commitments actively to the noteManager structure.
+ */
 async function handleSaveNote(e) {
     e.preventDefault();
     const title = ui.elements.titleInput.value.trim();
     const tags = ui.elements.tagsInput.value; 
     const content = ui.elements.contentInput.value.trim();
 
-    // UPDATED: Prevent save and show error if title is empty (Requirement E)
     if (!title) {
         ui.toggleTitleError(true);
         ui.elements.titleInput.focus();

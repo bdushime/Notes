@@ -1,11 +1,16 @@
+/**
+ * @fileoverview Primary Rendering Engine.
+ * Responsible for constructing DOM nodes, manipulating CSS classes, 
+ * and reflecting state variables onto the visual viewport interface.
+ */
+
 import * as noteManager from './noteManager.js';
 
-// --- DOM Elements ---
+/** Cache of heavy DOM node searches to prevent performance bottlenecking. */
 export const elements = {
     notesListContainer: document.querySelector('.notes-scroll-area'),
     sidebarTagsList: document.getElementById('sidebar-tags-list'),
-    
-    // Editor Form
+
     editorCol: document.querySelector('.note-editor-col'),
     noteForm: document.getElementById('note-form'),
     titleInput: document.querySelector('.editor-title-input'),
@@ -14,8 +19,7 @@ export const elements = {
     contentInput: document.querySelector('.editor-textarea'),
     timestampDisplay: document.querySelector('.timestamp'),
     saveBtn: document.querySelector('.btn-save, .editor-actions .btn-primary'),
-    
-    // Layout & Navigation
+
     layoutContainer: document.querySelector('.notes-layout'),
     backBtn: document.querySelector('.back-btn'),
     btnCancel: document.querySelectorAll('.btn-cancel, .btn-secondary'),
@@ -24,12 +28,12 @@ export const elements = {
     themeToggleBtn: document.querySelector('.settings-btn') 
 };
 
-// --- Helper Functions ---
-
 const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not yet saved';
 
 /**
- * NEW: Wraps matching search terms in <mark> tags (Requirement B Bonus)
+ * Isolates and wraps query terminology within mark tags for native visual highlighting.
+ * @param {string} text - The haystack string to process.
+ * @param {string} query - The needle variable being searched.
  */
 const highlightText = (text, query) => {
     if (!query || !query.trim()) return text;
@@ -55,7 +59,8 @@ export const toggleSaveButton = (isValid) => {
 };
 
 /**
- * UPDATED: Toggles visible validation error and adds shake animation (Requirement E)
+ * Overrides visible state validations onto designated input fields dynamically.
+ * @param {boolean} show - Controls error rendering toggle boolean flag.
  */
 export const toggleTitleError = (show) => {
     if (elements.titleError) {
@@ -72,7 +77,8 @@ export const toggleTitleError = (show) => {
 };
 
 /**
- * FIXED: Replaced invalid :has/:contains selectors with standard logic
+ * Maps the Archive toggle actions across dynamic DOM node texts and SVGs reliably.
+ * @param {boolean} isArchived - Evaluated archival state.
  */
 export const updateArchiveStatusUI = (isArchived) => {
     const actionButtons = document.querySelectorAll('.mobile-editor-actions button, #desktop-meta-actions button');
@@ -106,10 +112,11 @@ export const updateArchiveStatusUI = (isArchived) => {
     });
 };
 
-// --- Core Rendering ---
-
 /**
- * UPDATED: Added searchQuery parameter for highlighting (Requirement B)
+ * Re-renders the core note collection sidebar array completely.
+ * @param {Array} notes - Collection payload mapping.
+ * @param {string|null} activeNoteId - Identification tracker focusing specific selection elements.
+ * @param {string} searchQuery - Interpolates query markings actively within generated titles.
  */
 export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") => {
     const container = elements.notesListContainer;
@@ -119,7 +126,7 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
     }
 
     container.innerHTML = notes.map(note => {
-        // Highlight title and tags based on search query
+
         const highlightedTitle = highlightText(note.title || 'Untitled', searchQuery);
 
         return `
@@ -171,6 +178,10 @@ export const renderMobileTagsMenu = (tags) => {
     `).join('');
 };
 
+/**
+ * Pushes interactive note property states forcefully backwards into active editing DOM node inputs.
+ * @param {Object|null} note 
+ */
 export const populateEditor = (note = null) => {
     const { titleInput, tagsInput, contentInput, timestampDisplay, noteForm } = elements;
     
@@ -179,8 +190,7 @@ export const populateEditor = (note = null) => {
     tagsInput.value = Array.isArray(note?.tags) ? note.tags.join(', ') : '';
     contentInput.value = note?.content || '';
     timestampDisplay.textContent = formatDate(note?.lastEdited);
-    
-    // Hide error when switching notes
+
     toggleTitleError(false);
     
     updateArchiveStatusUI(note?.isArchived || false);
@@ -191,11 +201,9 @@ export const applyTheme = (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
 };
 
-// --- Mobile View Toggles ---
 export const showEditorOnMobile = () => elements.layoutContainer.classList.add('viewing-note');
 export const hideEditorOnMobile = () => elements.layoutContainer.classList.remove('viewing-note');
 
-// --- Validation ---
 export const showValidationError = (input, message) => {
     input.setCustomValidity(message);
     input.reportValidity();
