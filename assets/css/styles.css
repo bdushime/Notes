@@ -601,6 +601,46 @@ mark {
 
 /* --- END CUSTOM MODAL --- */
 
+/* --- EXPORT / IMPORT SIDEBAR STYLES --- */
+
+/* Section label for the Data nav group */
+.nav-section-title {
+  padding: 8px 24px 4px;
+  color: var(--clr-neutral-400);
+  font-size: 11px;
+  font-weight: var(--fw-semi-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Import label acts as a nav-link but needs extra reset */
+label.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: var(--clr-neutral-300);
+  border-radius: 8px;
+  margin: 0 12px;
+  transition: background-color 0.2s, color 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+[data-theme="light"] label.nav-link {
+  color: var(--clr-neutral-600);
+}
+label.nav-link:hover {
+  background: var(--panel-color);
+  color: var(--text-color);
+}
+
+/* Disabled state — shown during an active import */
+label.nav-link.importing {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .auth-bg { background-color: var(--clr-neutral-900); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
 [data-theme="light"] .auth-bg { background-color: var(--clr-neutral-100); }
 .auth-container { width: 100%; max-width: 500px; display: flex; justify-content: center; align-items: center; }
