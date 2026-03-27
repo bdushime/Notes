@@ -64,6 +64,15 @@
           <div class="nav-divider"></div>
           <div class="nav-section-title">Tags</div>
           <ul class="nav-list" id="sidebar-tags-list"></ul>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Categories</div>
+          <ul class="nav-list" id="sidebar-categories-list"></ul>
+          <div style="padding: 4px 12px 12px;">
+            <button id="create-category-btn" class="btn btn-secondary" style="width:100%; font-size:0.8rem; padding: 8px 12px;">
+              + New Category
+            </button>
+          </div>
         </nav>
       </aside>
 
@@ -180,6 +189,13 @@
                     type="text"
                     placeholder="Add tags separated by commas"
                   />
+                </div>
+                <div class="metadata-item">
+                  <img src="./assets/images/icon-tag.svg" alt="" class="meta-icon" aria-hidden="true" />
+                  <label for="note-category-select">Category</label>
+                  <select id="note-category-select" class="category-select">
+                    <option value="">No Category</option>
+                  </select>
                 </div>
                 <div class="metadata-item">
                   <img
