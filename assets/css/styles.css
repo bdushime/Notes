@@ -601,6 +601,50 @@ mark {
 
 /* --- END CUSTOM MODAL --- */
 
+/* --- NOTE CATEGORIES STYLES --- */
+
+/* Category badge on note cards — distinct purple to differ from grey tag badges */
+.category-badge {
+  background-color: rgba(101, 78, 216, 0.18);
+  color: #a78bfa;
+  font-size: 0.7rem;
+  font-weight: var(--fw-semi-bold);
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(101, 78, 216, 0.3);
+  letter-spacing: 0.3px;
+}
+[data-theme="light"] .category-badge {
+  background-color: rgba(101, 78, 216, 0.1);
+  color: #6d28d9;
+  border-color: rgba(101, 78, 216, 0.25);
+}
+
+/* Category <select> in the note editor metadata row */
+.category-select {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: var(--fs-4);
+  outline: none;
+  cursor: pointer;
+  flex: 1;
+}
+.category-select option {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Empty state helper for category sidebar list */
+.nav-section-empty {
+  display: block;
+  padding: 6px 28px;
+  font-size: var(--fs-6);
+  color: var(--clr-neutral-500);
+  font-style: italic;
+}
+
 .auth-bg { background-color: var(--clr-neutral-900); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
 [data-theme="light"] .auth-bg { background-color: var(--clr-neutral-100); }
 .auth-container { width: 100%; max-width: 500px; display: flex; justify-content: center; align-items: center; }

@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         themes.setupSettingsListeners();
     } else {
         await noteManager.initializeNotes();
+        noteManager.initializeCategories();
         updateUI();
         setupEventListeners();
         recoverDraft();
@@ -55,13 +56,19 @@ function updateUI() {
     } else if (currentFilter.type === 'tag') {
         notesToDisplay = noteManager.filterByTag(currentFilter.value);
         titleElement.textContent = `Notes Tagged: ${currentFilter.value}`;
+    } else if (currentFilter.type === 'category') {
+        notesToDisplay = noteManager.filterByCategory(currentFilter.value);
+        titleElement.textContent = `Category: ${currentFilter.value}`;
     } else {
         notesToDisplay = noteManager.getAllNotes(false);
         titleElement.textContent = 'All Notes';
     }
 
+    const cats = noteManager.getCategories();
     ui.renderNotesList(notesToDisplay, activeNoteId);
     ui.renderTagsList(noteManager.getAllUniqueTags());
+    ui.renderCategoriesList(cats, currentFilter.type === 'category' ? currentFilter.value : null);
+    ui.renderCategoriesDropdown(cats);
 }
 
 /**
@@ -167,6 +174,32 @@ function setupEventListeners() {
             first.focus();
         }
     });
+
+    const createCategoryBtn = document.getElementById('create-category-btn');
+    const sidebarCategoriesList = document.getElementById('sidebar-categories-list');
+
+    createCategoryBtn?.addEventListener('click', () => {
+        const name = prompt('Enter a new category name:');
+        if (!name) return;
+        const created = noteManager.createCategory(name);
+        if (created) {
+            ui.showSuccessMessage(`Category "${name}" created!`);
+            updateUI();
+        } else {
+            alert(`Category "${name}" already exists or is invalid.`);
+        }
+    });
+
+    sidebarCategoriesList?.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-filter-category]');
+        if (!link) return;
+        e.preventDefault();
+        currentFilter = { type: 'category', value: link.dataset.filterCategory };
+        activeNoteId = null;
+        ui.populateEditor(null);
+        ui.hideEditorOnMobile();
+        updateUI();
+    });
 }
 
 /**
@@ -241,6 +274,7 @@ async function handleSaveNote(e) {
     const title = ui.elements.titleInput.value.trim();
     const tags = ui.elements.tagsInput.value; 
     const content = ui.elements.contentInput.value.trim();
+    const category = ui.elements.categorySelect?.value || null;
 
     if (!title) {
         ui.toggleTitleError(true);
@@ -252,10 +286,12 @@ async function handleSaveNote(e) {
 
     if (editingId) {
         noteManager.updateNote(editingId, { title, content, tags });
+        if (category !== null) noteManager.assignCategory(editingId, category);
         ui.showSuccessMessage('Note Updated!');
     } else {
         const location = await noteManager.getUserLocation();
         const newNote = noteManager.createNote(title, content, tags, location);
+        if (category) noteManager.assignCategory(newNote.id, category);
         activeNoteId = newNote.id;
         ui.showSuccessMessage('Note Created Successfully!');
     }
