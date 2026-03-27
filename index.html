@@ -302,8 +302,8 @@
          aria-labelledby="cat-modal-title">
       <div class="modal-card">
         <div class="modal-body">
-          <div class="modal-icon-container" style="background: rgba(101, 78, 216, 0.1);">
-            <img src="./assets/images/icon-tag.svg" alt="" style="width: 24px; filter: var(--icon-filter);" />
+          <div class="modal-icon-container cat-modal-icon">
+            <img src="./assets/images/icon-tag.svg" alt="" class="modal-cat-icon" aria-hidden="true" />
           </div>
           <div class="modal-text-content">
             <h3 id="cat-modal-title" class="modal-title">New Category</h3>
@@ -313,7 +313,7 @@
         </div>
         <div class="modal-footer">
           <button id="cat-modal-cancel-btn" class="btn btn-secondary modal-btn">Cancel</button>
-          <button id="cat-modal-create-btn" class="modal-btn btn-primary" style="background: var(--clr-primary); color: white;">Create Category</button>
+          <button id="cat-modal-create-btn" class="btn btn-primary modal-btn">Create Category</button>
         </div>
       </div>
     </div>
