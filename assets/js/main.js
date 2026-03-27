@@ -179,15 +179,20 @@ function setupEventListeners() {
     const sidebarCategoriesList = document.getElementById('sidebar-categories-list');
 
     createCategoryBtn?.addEventListener('click', () => {
-        const name = prompt('Enter a new category name:');
-        if (!name) return;
-        const created = noteManager.createCategory(name);
-        if (created) {
-            ui.showSuccessMessage(`Category "${name}" created!`);
-            updateUI();
-        } else {
-            alert(`Category "${name}" already exists or is invalid.`);
-        }
+        openCategoryModal();
+    });
+
+    ui.elements.catModalCancelBtn?.addEventListener('click', closeCategoryModal);
+    
+    ui.elements.catModalCreateBtn?.addEventListener('click', handleCreateCategory);
+
+    ui.elements.catModalInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleCreateCategory();
+        if (e.key === 'Escape') closeCategoryModal();
+    });
+
+    ui.elements.catModalOverlay?.addEventListener('click', (e) => {
+        if (e.target === ui.elements.catModalOverlay) closeCategoryModal();
     });
 
     sidebarCategoriesList?.addEventListener('click', (e) => {
@@ -346,10 +351,36 @@ function handleNoteActions(e) {
 }
 
 function closeModal() {
-    document.getElementById('delete-modal-overlay').classList.add('hidden');
+    ui.elements.deleteModalOverlay.classList.add('hidden');
     noteIdToProcess = null;
     pendingAction = null;
     if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+function openCategoryModal() {
+    lastFocusedElement = document.activeElement;
+    ui.elements.catModalInput.value = '';
+    ui.elements.catModalOverlay.classList.remove('hidden');
+    setTimeout(() => ui.elements.catModalInput.focus(), 10);
+}
+
+function closeCategoryModal() {
+    ui.elements.catModalOverlay.classList.add('hidden');
+    if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+function handleCreateCategory() {
+    const name = ui.elements.catModalInput.value.trim();
+    if (!name) return;
+
+    const created = noteManager.createCategory(name);
+    if (created) {
+        ui.showSuccessMessage(`Category "${name}" created!`);
+        updateUI();
+        closeCategoryModal();
+    } else {
+        alert(`Category "${name}" already exists or is invalid.`);
+    }
 }
 
 function handleSearch(e) {

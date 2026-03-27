@@ -27,7 +27,14 @@ export const elements = {
     btnCancel: document.querySelectorAll('.btn-cancel, .btn-secondary'),
     createBtns: document.querySelectorAll('.create-note-btn, .create-note-fab'),
 
-    themeToggleBtn: document.querySelector('.settings-btn') 
+    themeToggleBtn: document.querySelector('.settings-btn'),
+
+    // Modals
+    deleteModalOverlay: document.getElementById('delete-modal-overlay'),
+    catModalOverlay: document.getElementById('category-modal-overlay'),
+    catModalInput: document.getElementById('new-category-name'),
+    catModalCancelBtn: document.getElementById('cat-modal-cancel-btn'),
+    catModalCreateBtn: document.getElementById('cat-modal-create-btn')
 };
 
 const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not yet saved';

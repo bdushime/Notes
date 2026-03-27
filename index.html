@@ -294,6 +294,30 @@
       </div>
     </div>
 
+    <!-- Category Modal -->
+    <div id="category-modal-overlay" 
+         class="modal-overlay hidden" 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="cat-modal-title">
+      <div class="modal-card">
+        <div class="modal-body">
+          <div class="modal-icon-container" style="background: rgba(101, 78, 216, 0.1);">
+            <img src="./assets/images/icon-tag.svg" alt="" style="width: 24px; filter: var(--icon-filter);" />
+          </div>
+          <div class="modal-text-content">
+            <h3 id="cat-modal-title" class="modal-title">New Category</h3>
+            <p class="modal-subtitle">Enter a name for your new category to organize your notes.</p>
+            <input type="text" id="new-category-name" class="modal-input" placeholder="Category name..." />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cat-modal-cancel-btn" class="btn btn-secondary modal-btn">Cancel</button>
+          <button id="cat-modal-create-btn" class="modal-btn btn-primary" style="background: var(--clr-primary); color: white;">Create Category</button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="./assets/js/main.js"></script>
   </body>
 </html>
