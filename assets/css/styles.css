@@ -601,6 +601,92 @@ mark {
 
 /* --- END CUSTOM MODAL --- */
 
+/* --- RICH TEXT EDITOR & TOOLBAR --- */
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: var(--panel-color);
+}
+
+.toolbar-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+  background-color: rgba(51, 92, 255, 0.1);
+  color: var(--clr-blue-500);
+  border-color: rgba(51, 92, 255, 0.2);
+}
+
+.toolbar-btn.active {
+  background-color: var(--clr-blue-500);
+  color: white;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background-color: var(--border-color);
+  margin: 0 4px;
+}
+
+.editor-textarea[contenteditable="true"] {
+  min-height: 300px;
+  padding: 1rem;
+  overflow-y: auto;
+  outline: none;
+  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  line-height: 1.6;
+}
+
+.editor-textarea[contenteditable="true"]:empty:before {
+  content: attr(data-placeholder);
+  color: var(--clr-neutral-500);
+  pointer-events: none;
+  display: block; /* For Firefox */
+}
+
+/* Ensure lists have proper styling inside editor */
+.editor-textarea ul, .editor-textarea ol {
+  padding-left: 24px;
+  margin-bottom: 12px;
+}
+.editor-textarea ul { list-style-type: disc; }
+.editor-textarea ol { list-style-type: decimal; }
+
+.note-preview {
+  font-size: 0.8rem;
+  color: var(--clr-neutral-500);
+  margin-top: 8px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .auth-bg { background-color: var(--clr-neutral-900); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
 [data-theme="light"] .auth-bg { background-color: var(--clr-neutral-100); }
 .auth-container { width: 100%; max-width: 500px; display: flex; justify-content: center; align-items: center; }

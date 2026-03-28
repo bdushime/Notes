@@ -192,11 +192,26 @@
                   <span class="timestamp">Not yet saved</span>
                 </div>
               </div>
-              <textarea
+              
+              <!-- Rich Text Toolbar -->
+              <div class="editor-toolbar" role="toolbar" aria-label="Text formatting">
+                <button type="button" class="toolbar-btn" data-command="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+                <button type="button" class="toolbar-btn" data-command="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+                <button type="button" class="toolbar-btn" data-command="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+                <div class="toolbar-separator"></div>
+                <button type="button" class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">•</button>
+                <button type="button" class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">1.</button>
+              </div>
+
+              <div
+                id="note-content-editor"
                 class="editor-textarea"
-                placeholder="Start typing your note here..."
+                contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
                 aria-label="Note content"
-              ></textarea>
+                data-placeholder="Start typing your note here..."
+              ></div>
             </form>
             <div class="editor-actions">
               <span id="draft-status" class="draft-status"></span>
