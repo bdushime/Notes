@@ -125,11 +125,20 @@ function setupEventListeners() {
     document.querySelectorAll('.mobile-editor-actions, #desktop-meta-actions')
             .forEach(w => w.addEventListener('click', handleNoteActions));
 
-    if (searchInput) searchInput.addEventListener('input', handleSearch);
-
-    const inputs = [ui.elements.titleInput, ui.elements.contentInput, ui.elements.tagsInput];
+    const inputs = [ui.elements.titleInput, ui.elements.tagsInput];
     inputs.forEach(input => {
         if(input) input.addEventListener('input', handleAutoDraft);
+    });
+
+    // ContentEditable input event for auto-draft
+    ui.elements.contentInput?.addEventListener('input', handleAutoDraft);
+
+    // Rich Text Toolbar buttons
+    document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const command = btn.dataset.command;
+            applyFormatting(command);
+        });
     });
 
     cancelModalBtn?.addEventListener('click', closeModal);
@@ -237,10 +246,10 @@ function startNewNote() {
  * Harvests values sequentially and passes storage commitments actively to the noteManager structure.
  */
 async function handleSaveNote(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const title = ui.elements.titleInput.value.trim();
     const tags = ui.elements.tagsInput.value; 
-    const content = ui.elements.contentInput.value.trim();
+    const content = ui.elements.contentInput.innerHTML;
 
     if (!title) {
         ui.toggleTitleError(true);
@@ -348,7 +357,7 @@ function handleAutoDraft() {
 
     storage.saveDraft({
         title: ui.elements.titleInput.value,
-        content: ui.elements.contentInput.value,
+        content: ui.elements.contentInput.innerHTML,
         tags: ui.elements.tagsInput.value
     });
 
@@ -371,10 +380,19 @@ function recoverDraft() {
     const savedDraft = storage.loadDraft();
     if (savedDraft && !activeNoteId) {
         ui.elements.titleInput.value = savedDraft.title || '';
-        ui.elements.contentInput.value = savedDraft.content || '';
+        ui.elements.contentInput.innerHTML = savedDraft.content || '';
         ui.elements.tagsInput.value = savedDraft.tags || '';
         ui.toggleSaveButton(!!savedDraft.title?.trim());
     }
+}
+
+/**
+ * Executes a rich text formatting command on the current selection.
+ * @param {string} command - The document.execCommand to run.
+ */
+function applyFormatting(command) {
+    document.execCommand(command, false, null);
+    ui.elements.contentInput.focus();
 }
 
 function handleCancel(e) {
