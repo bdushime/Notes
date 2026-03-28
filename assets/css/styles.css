@@ -642,6 +642,23 @@ mark {
   color: white;
 }
 
+/* Tooltip style for toolbar buttons */
+.toolbar-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--clr-neutral-800);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+}
+
 .toolbar-separator {
   width: 1px;
   height: 20px;
