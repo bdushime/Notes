@@ -135,11 +135,18 @@ function setupEventListeners() {
 
     // Rich Text Toolbar buttons
     document.querySelectorAll('.toolbar-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent button from stealing focus from editor
             const command = btn.dataset.command;
             applyFormatting(command);
         });
+        btn.addEventListener('click', (e) => e.preventDefault()); // Stop any secondary click behavior
     });
+
+    // Sync toolbar active status with current selection
+    document.addEventListener('selectionchange', updateToolbarStatus);
+    ui.elements.contentInput?.addEventListener('keyup', updateToolbarStatus);
+    ui.elements.contentInput?.addEventListener('mouseup', updateToolbarStatus);
 
     cancelModalBtn?.addEventListener('click', closeModal);
     
@@ -391,8 +398,33 @@ function recoverDraft() {
  * @param {string} command - The document.execCommand to run.
  */
 function applyFormatting(command) {
+    ui.elements.contentInput.focus(); // Ensure editor is focused
+    document.execCommand('styleWithCSS', false, false); // Prefer tags over styles
     document.execCommand(command, false, null);
-    ui.elements.contentInput.focus();
+    updateToolbarStatus(); // Update visual state immediately
+}
+
+/**
+ * Updates the visual "Active" state of the toolbar buttons 
+ * based on the current text selection formatting.
+ */
+function updateToolbarStatus() {
+    const buttons = document.querySelectorAll('.toolbar-btn');
+    buttons.forEach(btn => {
+        const command = btn.dataset.command;
+        if (!command) return;
+        
+        try {
+            const isActive = document.queryCommandState(command);
+            if (isActive) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        } catch (e) {
+            // Some commands might not support queryCommandState
+        }
+    });
 }
 
 function handleCancel(e) {

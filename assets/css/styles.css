@@ -684,6 +684,28 @@ mark {
   display: block; /* For Firefox */
 }
 
+/* Force standard formatting tags to display with maximum priority */
+#note-content-editor b, 
+#note-content-editor strong { 
+    font-weight: 700 !important;
+    display: inline !important;
+}
+#note-content-editor i, 
+#note-content-editor em { 
+    font-style: italic !important;
+    display: inline !important;
+}
+#note-content-editor u { 
+    text-decoration: underline !important;
+    display: inline !important;
+}
+
+/* Ensure the editor itself doesn't force a normal weight on children */
+#note-content-editor {
+    font-weight: 400;
+    font-style: normal;
+}
+
 /* Ensure lists have proper styling inside editor */
 .editor-textarea ul, .editor-textarea ol {
   padding-left: 24px;
