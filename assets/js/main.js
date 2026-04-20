@@ -183,6 +183,26 @@ function setupEventListeners() {
             first.focus();
         }
     });
+
+    const exportBtn = document.getElementById('export-notes-btn');
+    const importInput = document.getElementById('import-notes-input');
+
+    exportBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        noteManager.exportNotes();
+    });
+
+    importInput?.addEventListener('change', async (e) => {
+        if (!e.target.files.length) return;
+        const result = await noteManager.importNotes(e.target.files[0]);
+        if (result.success) {
+            ui.showSuccessMessage(`Imported ${result.added} notes. Skipped ${result.skipped}.`);
+            updateUI();
+        } else {
+            alert(result.error);
+        }
+        e.target.value = ''; 
+    });
 }
 
 /**
@@ -191,6 +211,11 @@ function setupEventListeners() {
 function handleNavigation(e) {
     const link = e.target.closest('.nav-link, .mobile-nav-item');
     if (!link) return;
+    
+    // Skip navigation logic for export/import elements to avoid preventDefault() blocking
+    if (link.id === 'export-notes-btn' || link.getAttribute('for') === 'import-notes-input') {
+        return;
+    }
     
     if (link.textContent.toLowerCase().includes('settings')) {
         window.location.href = 'settings.html';
@@ -286,6 +311,12 @@ function handleNoteActions(e) {
 
     const isDelete = btn.querySelector('img[src*="delete"]') || btn.textContent.includes('Delete');
     const isArchive = btn.querySelector('img[src*="archive"]') || btn.textContent.includes('Archive') || btn.textContent.includes('Restore');
+    const isShare = btn.id === 'share-note-btn' || btn.id === 'mobile-share-btn' || btn.textContent.includes('Share');
+
+    if (isShare) {
+        handleShareNote(activeNoteId);
+        return;
+    }
 
     const modalTitle = document.getElementById('modal-title');
     const modalSubtitle = document.getElementById('modal-subtitle');
@@ -439,4 +470,41 @@ function resetEditorAfterAction() {
     ui.populateEditor(null);
     ui.hideEditorOnMobile();
     updateUI();
+}
+
+/**
+ * Generates a shareable link for the active note and copies it to the clipboard.
+ * @param {string} noteId - ID of the note to share.
+ */
+function handleShareNote(noteId) {
+    if (!noteId) return;
+
+    // Construct the sharing URL
+    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '').replace('settings.html', '');
+    const shareUrl = `${baseUrl}share.html?id=${noteId}`;
+
+    // Copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => {
+                ui.showSuccessMessage('Shareable link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy link: ', err);
+                ui.showSuccessMessage('Failed to copy link. Check console.');
+            });
+    } else {
+        // Fallback for browsers without Clipboard API
+        const textArea = document.createElement("textarea");
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            ui.showSuccessMessage('Shareable link copied to clipboard!');
+        } catch (err) {
+            console.error('Fallback copy failed: ', err);
+        }
+        document.body.removeChild(textArea);
+    }
 }
