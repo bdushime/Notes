@@ -5,6 +5,7 @@
 
 const STORAGE_KEY_NOTES = 'notesapp_notes';
 const STORAGE_KEY_PREFS = 'notesapp_prefs';
+const STORAGE_KEY_CATEGORIES = 'notesapp_categories';
 const SESSION_KEY_DRAFT = 'notesapp_draft';
 
 /**
@@ -63,6 +64,23 @@ export const loadPreferences = () => {
  */
 export const savePreferences = (prefs) => {
     localStorage.setItem(STORAGE_KEY_PREFS, JSON.stringify(prefs));
+};
+
+/**
+ * Fetches the user's saved custom categories from localStorage.
+ * @returns {string[]} Array of category name strings.
+ */
+export const loadCategories = () => {
+    const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+    return raw ? JSON.parse(raw) : [];
+};
+
+/**
+ * Persists the categories array to localStorage.
+ * @param {string[]} categories
+ */
+export const saveCategories = (categories) => {
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
 };
 
 /**

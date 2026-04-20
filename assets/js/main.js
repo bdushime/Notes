@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         themes.setupSettingsListeners();
     } else {
         await noteManager.initializeNotes();
+        noteManager.initializeCategories();
         updateUI();
         setupEventListeners();
         recoverDraft();
@@ -55,13 +56,19 @@ function updateUI() {
     } else if (currentFilter.type === 'tag') {
         notesToDisplay = noteManager.filterByTag(currentFilter.value);
         titleElement.textContent = `Notes Tagged: ${currentFilter.value}`;
+    } else if (currentFilter.type === 'category') {
+        notesToDisplay = noteManager.filterByCategory(currentFilter.value);
+        titleElement.textContent = `Category: ${currentFilter.value}`;
     } else {
         notesToDisplay = noteManager.getAllNotes(false);
         titleElement.textContent = 'All Notes';
     }
 
+    const cats = noteManager.getCategories();
     ui.renderNotesList(notesToDisplay, activeNoteId);
     ui.renderTagsList(noteManager.getAllUniqueTags());
+    ui.renderCategoriesList(cats, currentFilter.type === 'category' ? currentFilter.value : null);
+    ui.renderCategoriesDropdown(cats);
 }
 
 /**
@@ -293,10 +300,12 @@ async function handleSaveNote(e) {
 
     if (editingId) {
         noteManager.updateNote(editingId, { title, content, tags });
+        if (category !== null) noteManager.assignCategory(editingId, category);
         ui.showSuccessMessage('Note Updated!');
     } else {
         const location = await noteManager.getUserLocation();
         const newNote = noteManager.createNote(title, content, tags, location);
+        if (category) noteManager.assignCategory(newNote.id, category);
         activeNoteId = newNote.id;
         ui.showSuccessMessage('Note Created Successfully!');
     }
@@ -357,10 +366,36 @@ function handleNoteActions(e) {
 }
 
 function closeModal() {
-    document.getElementById('delete-modal-overlay').classList.add('hidden');
+    ui.elements.deleteModalOverlay.classList.add('hidden');
     noteIdToProcess = null;
     pendingAction = null;
     if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+function openCategoryModal() {
+    lastFocusedElement = document.activeElement;
+    ui.elements.catModalInput.value = '';
+    ui.elements.catModalOverlay.classList.remove('hidden');
+    setTimeout(() => ui.elements.catModalInput.focus(), 10);
+}
+
+function closeCategoryModal() {
+    ui.elements.catModalOverlay.classList.add('hidden');
+    if (lastFocusedElement) lastFocusedElement.focus();
+}
+
+function handleCreateCategory() {
+    const name = ui.elements.catModalInput.value.trim();
+    if (!name) return;
+
+    const created = noteManager.createCategory(name);
+    if (created) {
+        ui.showSuccessMessage(`Category "${name}" created!`);
+        updateUI();
+        closeCategoryModal();
+    } else {
+        alert(`Category "${name}" already exists or is invalid.`);
+    }
 }
 
 function handleSearch(e) {

@@ -82,6 +82,15 @@
           <div class="nav-divider"></div>
           <div class="nav-section-title">Tags</div>
           <ul class="nav-list" id="sidebar-tags-list"></ul>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Categories</div>
+          <ul class="nav-list" id="sidebar-categories-list"></ul>
+          <div style="padding: 4px 12px 12px;">
+            <button id="create-category-btn" class="btn btn-secondary" style="width:100%; font-size:0.8rem; padding: 8px 12px;">
+              + New Category
+            </button>
+          </div>
         </nav>
       </aside>
 
@@ -200,6 +209,13 @@
                   />
                 </div>
                 <div class="metadata-item">
+                  <img src="./assets/images/icon-tag.svg" alt="" class="meta-icon" aria-hidden="true" />
+                  <label for="note-category-select">Category</label>
+                  <select id="note-category-select" class="category-select">
+                    <option value="">No Category</option>
+                  </select>
+                </div>
+                <div class="metadata-item">
                   <img
                     src="./assets/images/icon-clock.svg"
                     alt=""
@@ -316,6 +332,30 @@
         <div class="modal-footer">
           <button id="modal-cancel-btn" class="btn btn-secondary modal-btn">Cancel</button>
           <button id="modal-confirm-delete-btn" class="modal-btn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal-overlay" 
+         class="modal-overlay hidden" 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="cat-modal-title">
+      <div class="modal-card">
+        <div class="modal-body">
+          <div class="modal-icon-container cat-modal-icon">
+            <img src="./assets/images/icon-tag.svg" alt="" class="modal-cat-icon" aria-hidden="true" />
+          </div>
+          <div class="modal-text-content">
+            <h3 id="cat-modal-title" class="modal-title">New Category</h3>
+            <p class="modal-subtitle">Enter a name for your new category to organize your notes.</p>
+            <input type="text" id="new-category-name" class="modal-input" placeholder="Category name..." />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cat-modal-cancel-btn" class="btn btn-secondary modal-btn">Cancel</button>
+          <button id="cat-modal-create-btn" class="btn btn-primary modal-btn">Create Category</button>
         </div>
       </div>
     </div>

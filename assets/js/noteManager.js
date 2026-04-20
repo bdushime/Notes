@@ -4,9 +4,11 @@
  */
 import * as storage from './storage.js';
 
-export let notes = []; 
+export let notes = [];
+export let categories = [];
 
 const syncStorage = () => storage.saveNotes(notes);
+const syncCategories = () => storage.saveCategories(categories);
 const sortByDate = (data) => [...data].sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited));
 
 /**
@@ -44,6 +46,14 @@ export const initializeNotes = async () => {
     }));
     
     return notes;
+};
+
+/**
+ * Boots the categories array from localStorage.
+ */
+export const initializeCategories = () => {
+    categories = storage.loadCategories();
+    return categories;
 };
 
 /**

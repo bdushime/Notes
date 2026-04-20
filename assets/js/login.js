@@ -9,7 +9,7 @@ loginForm.addEventListener('submit', (e) => {
 
     try {
         auth.loginUser(emailInput.value.trim(), passwordInput.value);
-        window.location.href = '../index.html'; // Go to app
+        window.location.href = '../index.html'; 
     } catch (error) {
         alert(error.message);
     }

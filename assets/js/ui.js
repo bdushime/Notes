@@ -10,11 +10,12 @@ import * as noteManager from './noteManager.js';
 export const elements = {
     notesListContainer: document.querySelector('.notes-scroll-area'),
     sidebarTagsList: document.getElementById('sidebar-tags-list'),
+    sidebarCategoriesList: document.getElementById('sidebar-categories-list'),
 
     editorCol: document.querySelector('.note-editor-col'),
     noteForm: document.getElementById('note-form'),
     titleInput: document.querySelector('.editor-title-input'),
-    titleError: document.getElementById('title-error'), // Reference for validation
+    titleError: document.getElementById('title-error'),
     tagsInput: document.querySelector('.metadata-item input[placeholder="Add tags separated by commas"]'),
     contentInput: document.getElementById('note-content-editor'),
     timestampDisplay: document.querySelector('.timestamp'),
@@ -25,7 +26,14 @@ export const elements = {
     btnCancel: document.querySelectorAll('.btn-cancel, .btn-secondary'),
     createBtns: document.querySelectorAll('.create-note-btn, .create-note-fab'),
 
-    themeToggleBtn: document.querySelector('.settings-btn') 
+    themeToggleBtn: document.querySelector('.settings-btn'),
+
+    // Modals
+    deleteModalOverlay: document.getElementById('delete-modal-overlay'),
+    catModalOverlay: document.getElementById('category-modal-overlay'),
+    catModalInput: document.getElementById('new-category-name'),
+    catModalCancelBtn: document.getElementById('cat-modal-cancel-btn'),
+    catModalCreateBtn: document.getElementById('cat-modal-create-btn')
 };
 
 const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not yet saved';
@@ -146,6 +154,7 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
                         const highlightedTag = highlightText(tag, searchQuery);
                         return `<span class="tag-badge">${highlightedTag}</span>`;
                     }).join('')}
+                    ${note.category ? `<span class="category-badge">${note.category}</span>` : ''}
                 </div>
                 <p class="note-preview">${highlightedPreview}</p>
                 <div class="note-meta-row">
@@ -189,13 +198,14 @@ export const renderMobileTagsMenu = (tags) => {
  * @param {Object|null} note 
  */
 export const populateEditor = (note = null) => {
-    const { titleInput, tagsInput, contentInput, timestampDisplay, noteForm } = elements;
+    const { titleInput, tagsInput, contentInput, timestampDisplay, noteForm, categorySelect } = elements;
     
     noteForm.dataset.editingId = note?.id || '';
     titleInput.value = note?.title || '';
     tagsInput.value = Array.isArray(note?.tags) ? note.tags.join(', ') : '';
     contentInput.innerHTML = note?.content || '';
     timestampDisplay.textContent = formatDate(note?.lastEdited);
+    if (categorySelect) categorySelect.value = note?.category || '';
 
     toggleTitleError(false);
     
