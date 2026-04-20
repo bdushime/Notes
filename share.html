@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Note | Notes App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <style>
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .share-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--panel-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        .share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        .share-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        .share-meta {
+            color: var(--clr-neutral-500);
+            font-size: 0.9rem;
+        }
+        .share-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap; /* Fallback for plaintext */
+        }
+        /* Support for rich text formatting */
+        .share-content b, .share-content strong { font-weight: 700; }
+        .share-content i, .share-content em { font-style: italic; }
+        .share-content u { text-decoration: underline; }
+        .share-content ul, .share-content ol { padding-left: 1.5rem; margin: 1rem 0; }
+        
+        .back-link {
+            text-decoration: none;
+            color: var(--clr-blue-500);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            align-self: flex-start;
+            max-width: 800px;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .empty-message {
+            text-align: center;
+            padding: 4rem;
+            color: var(--clr-neutral-500);
+        }
+    </style>
+</head>
+<body data-theme="system">
+    <a href="index.html" class="back-link">
+        <img src="./assets/images/icon-arrow-left.svg" alt="" aria-hidden="true" style="width: 16px;">
+        Back to my notes
+    </a>
+
+    <div id="share-view" class="share-container">
+        <div class="empty-message">Loading note...</div>
+    </div>
+
+    <script type="module" src="./assets/js/share.js"></script>
+</body>
+</html>
