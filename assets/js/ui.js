@@ -263,6 +263,7 @@ export const renderCategoriesDropdown = (categories) => {
     select.value = categories.includes(current) ? current : '';
 };
 
+/**
  * Utility to strip HTML tags from a string for plain text previews.
  * @param {string} html - The HTML string to strip.
  * @returns {string} - Cleaned plain text.
