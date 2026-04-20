@@ -167,6 +167,26 @@ function setupEventListeners() {
             first.focus();
         }
     });
+
+    const exportBtn = document.getElementById('export-notes-btn');
+    const importInput = document.getElementById('import-notes-input');
+
+    exportBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        noteManager.exportNotes();
+    });
+
+    importInput?.addEventListener('change', async (e) => {
+        if (!e.target.files.length) return;
+        const result = await noteManager.importNotes(e.target.files[0]);
+        if (result.success) {
+            ui.showSuccessMessage(`Imported ${result.added} notes. Skipped ${result.skipped}.`);
+            updateUI();
+        } else {
+            alert(result.error);
+        }
+        e.target.value = ''; 
+    });
 }
 
 /**
@@ -175,6 +195,11 @@ function setupEventListeners() {
 function handleNavigation(e) {
     const link = e.target.closest('.nav-link, .mobile-nav-item');
     if (!link) return;
+    
+    // Skip navigation logic for export/import elements to avoid preventDefault() blocking
+    if (link.id === 'export-notes-btn' || link.getAttribute('for') === 'import-notes-input') {
+        return;
+    }
     
     if (link.textContent.toLowerCase().includes('settings')) {
         window.location.href = 'settings.html';
