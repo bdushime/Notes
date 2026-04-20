@@ -16,7 +16,7 @@ export const elements = {
     titleInput: document.querySelector('.editor-title-input'),
     titleError: document.getElementById('title-error'), // Reference for validation
     tagsInput: document.querySelector('.metadata-item input[placeholder="Add tags separated by commas"]'),
-    contentInput: document.querySelector('.editor-textarea'),
+    contentInput: document.getElementById('note-content-editor'),
     timestampDisplay: document.querySelector('.timestamp'),
     saveBtn: document.querySelector('.btn-save, .editor-actions .btn-primary'),
 
@@ -128,6 +128,11 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
     container.innerHTML = notes.map(note => {
 
         const highlightedTitle = highlightText(note.title || 'Untitled', searchQuery);
+        
+        // Strip HTML for the preview snippet to avoid showing raw tags or breaking highlighting
+        const plainContent = stripHTML(note.content || '');
+        const preview = plainContent.substring(0, 70) + (plainContent.length > 70 ? '...' : '');
+        const highlightedPreview = highlightText(preview, searchQuery);
 
         return `
             <div class="note-item ${note.id === activeNoteId ? 'active' : ''}" 
@@ -142,6 +147,7 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
                         return `<span class="tag-badge">${highlightedTag}</span>`;
                     }).join('')}
                 </div>
+                <p class="note-preview">${highlightedPreview}</p>
                 <div class="note-meta-row">
                     <span class="note-date">${formatDate(note.lastEdited)}</span>
                     ${note.location ? `<span class="location-badge">📍 Loc: ${note.location.lat.toFixed(2)}, ${note.location.lng.toFixed(2)}</span>` : ''}
@@ -188,7 +194,7 @@ export const populateEditor = (note = null) => {
     noteForm.dataset.editingId = note?.id || '';
     titleInput.value = note?.title || '';
     tagsInput.value = Array.isArray(note?.tags) ? note.tags.join(', ') : '';
-    contentInput.value = note?.content || '';
+    contentInput.innerHTML = note?.content || '';
     timestampDisplay.textContent = formatDate(note?.lastEdited);
 
     toggleTitleError(false);
@@ -210,3 +216,14 @@ export const showValidationError = (input, message) => {
 };
 
 export const clearValidation = (input) => input.setCustomValidity('');
+
+/**
+ * Utility to strip HTML tags from a string for plain text previews.
+ * @param {string} html - The HTML string to strip.
+ * @returns {string} - Cleaned plain text.
+ */
+export const stripHTML = (html) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+};
