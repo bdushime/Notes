@@ -157,3 +157,68 @@ export const getAllUniqueTags = () => {
     const allTags = notes.flatMap(note => Array.isArray(note.tags) ? note.tags : []);
     return [...new Set(allTags)].sort((a, b) => a.localeCompare(b));
 };
+
+/**
+ * Triggers a download of all notes as a JSON file.
+ */
+export const exportNotes = () => {
+    const dataStr = JSON.stringify(notes, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notes-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
+/**
+ * Reads a JSON file, validates its structure, and merges new notes into the app.
+ * @param {File} file 
+ * @returns {Promise<{success: boolean, added: number, skipped: number, error: string}>}
+ */
+export const importNotes = (file) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!Array.isArray(data)) {
+                    return resolve({ success: false, error: 'Invalid format: Must be an array of notes.' });
+                }
+
+                let added = 0;
+                let skipped = 0;
+
+                data.forEach(item => {
+                    if (item.id && item.title !== undefined) {
+                        const exists = notes.find(n => n.id === item.id);
+                        if (!exists) {
+                            if (item.tags && !Array.isArray(item.tags)) {
+                                item.tags = item.tags.split(',').map(t => t.trim()).filter(Boolean);
+                            }
+                            notes.push(item);
+                            added++;
+                        } else {
+                            skipped++;
+                        }
+                    } else {
+                        skipped++;
+                    }
+                });
+
+                if (added > 0) {
+                    syncStorage();
+                }
+                resolve({ success: true, added, skipped });
+            } catch (err) {
+                resolve({ success: false, error: 'Failed to parse JSON file.' });
+            }
+        };
+        reader.readAsText(file);
+    });
+};
