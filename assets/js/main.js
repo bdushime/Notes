@@ -191,6 +191,36 @@ function setupEventListeners() {
         }
     });
 
+    const createCategoryBtn = document.getElementById('create-category-btn');
+    const sidebarCategoriesList = document.getElementById('sidebar-categories-list');
+
+    createCategoryBtn?.addEventListener('click', () => {
+        openCategoryModal();
+    });
+
+    ui.elements.catModalCancelBtn?.addEventListener('click', closeCategoryModal);
+    
+    ui.elements.catModalCreateBtn?.addEventListener('click', handleCreateCategory);
+
+    ui.elements.catModalInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleCreateCategory();
+        if (e.key === 'Escape') closeCategoryModal();
+    });
+
+    ui.elements.catModalOverlay?.addEventListener('click', (e) => {
+        if (e.target === ui.elements.catModalOverlay) closeCategoryModal();
+    });
+
+    sidebarCategoriesList?.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-filter-category]');
+        if (!link) return;
+        e.preventDefault();
+        currentFilter = { type: 'category', value: link.dataset.filterCategory };
+        activeNoteId = null;
+        ui.populateEditor(null);
+        ui.hideEditorOnMobile();
+        updateUI();
+    });
     const exportBtn = document.getElementById('export-notes-btn');
     const importInput = document.getElementById('import-notes-input');
 
@@ -289,6 +319,7 @@ async function handleSaveNote(e) {
     const title = ui.elements.titleInput.value.trim();
     const tags = ui.elements.tagsInput.value; 
     const content = ui.elements.contentInput.innerHTML;
+    const category = ui.elements.categorySelect?.value || null;
 
     if (!title) {
         ui.toggleTitleError(true);

@@ -168,6 +168,60 @@ export const getAllUniqueTags = () => {
     return [...new Set(allTags)].sort((a, b) => a.localeCompare(b));
 };
 
+// ─── CATEGORY FUNCTIONS ──────────────────────────────────────────────────────
+
+/**
+ * Returns the full categories array.
+ */
+export const getCategories = () => categories;
+
+/**
+ * Creates a new category if it doesn't already exist.
+ * @param {string} name
+ * @returns {boolean} true if created, false if duplicate.
+ */
+export const createCategory = (name) => {
+    const trimmed = name.trim();
+    if (!trimmed || categories.includes(trimmed)) return false;
+    categories.push(trimmed);
+    syncCategories();
+    return true;
+};
+
+/**
+ * Removes a category and unassigns it from all notes.
+ * @param {string} name
+ */
+export const deleteCategory = (name) => {
+    categories = categories.filter(c => c !== name);
+    notes = notes.map(n => ({
+        ...n,
+        category: n.category === name ? null : n.category
+    }));
+    syncCategories();
+    syncStorage();
+};
+
+/**
+ * Assigns a category to a note by ID.
+ * @param {string} noteId
+ * @param {string|null} category
+ */
+export const assignCategory = (noteId, category) => {
+    const index = notes.findIndex(n => n.id === noteId);
+    if (index === -1) return;
+    notes[index] = { ...notes[index], category: category || null };
+    syncStorage();
+};
+
+/**
+ * Returns notes that belong to a specific category.
+ * @param {string} category
+ */
+export const filterByCategory = (category) => {
+    return sortByDate(notes.filter(n => n.category === category && !n.isArchived));
+};
+
 /**
  * Triggers a download of all notes as a JSON file.
  */
