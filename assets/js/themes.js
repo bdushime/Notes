@@ -141,14 +141,14 @@ export const setupSettingsListeners = () => {
                 return;
             }
             
-            confirmPass.setCustomValidity(''); // Clear error
+            confirmPass.setCustomValidity(''); 
             
             try {
                 const currentUserEmail = auth.checkAuth();
                 if (currentUserEmail) {
                     auth.changePassword(currentUserEmail, oldPass, newPass);
                     alert('Password successfully updated!');
-                    passwordForm.reset(); // clear fields naturally
+                    passwordForm.reset(); 
                 }
             } catch (err) {
                 alert(err.message);

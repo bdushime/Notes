@@ -132,12 +132,28 @@ function setupEventListeners() {
     document.querySelectorAll('.mobile-editor-actions, #desktop-meta-actions')
             .forEach(w => w.addEventListener('click', handleNoteActions));
 
-    if (searchInput) searchInput.addEventListener('input', handleSearch);
-
-    const inputs = [ui.elements.titleInput, ui.elements.contentInput, ui.elements.tagsInput];
+    const inputs = [ui.elements.titleInput, ui.elements.tagsInput];
     inputs.forEach(input => {
         if(input) input.addEventListener('input', handleAutoDraft);
     });
+
+    // ContentEditable input event for auto-draft
+    ui.elements.contentInput?.addEventListener('input', handleAutoDraft);
+
+    // Rich Text Toolbar buttons
+    document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent button from stealing focus from editor
+            const command = btn.dataset.command;
+            applyFormatting(command);
+        });
+        btn.addEventListener('click', (e) => e.preventDefault()); // Stop any secondary click behavior
+    });
+
+    // Sync toolbar active status with current selection
+    document.addEventListener('selectionchange', updateToolbarStatus);
+    ui.elements.contentInput?.addEventListener('keyup', updateToolbarStatus);
+    ui.elements.contentInput?.addEventListener('mouseup', updateToolbarStatus);
 
     cancelModalBtn?.addEventListener('click', closeModal);
     
@@ -175,35 +191,24 @@ function setupEventListeners() {
         }
     });
 
-    const createCategoryBtn = document.getElementById('create-category-btn');
-    const sidebarCategoriesList = document.getElementById('sidebar-categories-list');
+    const exportBtn = document.getElementById('export-notes-btn');
+    const importInput = document.getElementById('import-notes-input');
 
-    createCategoryBtn?.addEventListener('click', () => {
-        openCategoryModal();
-    });
-
-    ui.elements.catModalCancelBtn?.addEventListener('click', closeCategoryModal);
-    
-    ui.elements.catModalCreateBtn?.addEventListener('click', handleCreateCategory);
-
-    ui.elements.catModalInput?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleCreateCategory();
-        if (e.key === 'Escape') closeCategoryModal();
-    });
-
-    ui.elements.catModalOverlay?.addEventListener('click', (e) => {
-        if (e.target === ui.elements.catModalOverlay) closeCategoryModal();
-    });
-
-    sidebarCategoriesList?.addEventListener('click', (e) => {
-        const link = e.target.closest('[data-filter-category]');
-        if (!link) return;
+    exportBtn?.addEventListener('click', (e) => {
         e.preventDefault();
-        currentFilter = { type: 'category', value: link.dataset.filterCategory };
-        activeNoteId = null;
-        ui.populateEditor(null);
-        ui.hideEditorOnMobile();
-        updateUI();
+        noteManager.exportNotes();
+    });
+
+    importInput?.addEventListener('change', async (e) => {
+        if (!e.target.files.length) return;
+        const result = await noteManager.importNotes(e.target.files[0]);
+        if (result.success) {
+            ui.showSuccessMessage(`Imported ${result.added} notes. Skipped ${result.skipped}.`);
+            updateUI();
+        } else {
+            alert(result.error);
+        }
+        e.target.value = ''; 
     });
 }
 
@@ -213,6 +218,11 @@ function setupEventListeners() {
 function handleNavigation(e) {
     const link = e.target.closest('.nav-link, .mobile-nav-item');
     if (!link) return;
+    
+    // Skip navigation logic for export/import elements to avoid preventDefault() blocking
+    if (link.id === 'export-notes-btn' || link.getAttribute('for') === 'import-notes-input') {
+        return;
+    }
     
     if (link.textContent.toLowerCase().includes('settings')) {
         window.location.href = 'settings.html';
@@ -275,11 +285,10 @@ function startNewNote() {
  * Harvests values sequentially and passes storage commitments actively to the noteManager structure.
  */
 async function handleSaveNote(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const title = ui.elements.titleInput.value.trim();
     const tags = ui.elements.tagsInput.value; 
-    const content = ui.elements.contentInput.value.trim();
-    const category = ui.elements.categorySelect?.value || null;
+    const content = ui.elements.contentInput.innerHTML;
 
     if (!title) {
         ui.toggleTitleError(true);
@@ -311,6 +320,12 @@ function handleNoteActions(e) {
 
     const isDelete = btn.querySelector('img[src*="delete"]') || btn.textContent.includes('Delete');
     const isArchive = btn.querySelector('img[src*="archive"]') || btn.textContent.includes('Archive') || btn.textContent.includes('Restore');
+    const isShare = btn.id === 'share-note-btn' || btn.id === 'mobile-share-btn' || btn.textContent.includes('Share');
+
+    if (isShare) {
+        handleShareNote(activeNoteId);
+        return;
+    }
 
     const modalTitle = document.getElementById('modal-title');
     const modalSubtitle = document.getElementById('modal-subtitle');
@@ -415,7 +430,7 @@ function handleAutoDraft() {
 
     storage.saveDraft({
         title: ui.elements.titleInput.value,
-        content: ui.elements.contentInput.value,
+        content: ui.elements.contentInput.innerHTML,
         tags: ui.elements.tagsInput.value
     });
 
@@ -438,10 +453,44 @@ function recoverDraft() {
     const savedDraft = storage.loadDraft();
     if (savedDraft && !activeNoteId) {
         ui.elements.titleInput.value = savedDraft.title || '';
-        ui.elements.contentInput.value = savedDraft.content || '';
+        ui.elements.contentInput.innerHTML = savedDraft.content || '';
         ui.elements.tagsInput.value = savedDraft.tags || '';
         ui.toggleSaveButton(!!savedDraft.title?.trim());
     }
+}
+
+/**
+ * Executes a rich text formatting command on the current selection.
+ * @param {string} command - The document.execCommand to run.
+ */
+function applyFormatting(command) {
+    ui.elements.contentInput.focus(); // Ensure editor is focused
+    document.execCommand('styleWithCSS', false, false); // Prefer tags over styles
+    document.execCommand(command, false, null);
+    updateToolbarStatus(); // Update visual state immediately
+}
+
+/**
+ * Updates the visual "Active" state of the toolbar buttons 
+ * based on the current text selection formatting.
+ */
+function updateToolbarStatus() {
+    const buttons = document.querySelectorAll('.toolbar-btn');
+    buttons.forEach(btn => {
+        const command = btn.dataset.command;
+        if (!command) return;
+        
+        try {
+            const isActive = document.queryCommandState(command);
+            if (isActive) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        } catch (e) {
+            // Some commands might not support queryCommandState
+        }
+    });
 }
 
 function handleCancel(e) {
@@ -456,4 +505,41 @@ function resetEditorAfterAction() {
     ui.populateEditor(null);
     ui.hideEditorOnMobile();
     updateUI();
+}
+
+/**
+ * Generates a shareable link for the active note and copies it to the clipboard.
+ * @param {string} noteId - ID of the note to share.
+ */
+function handleShareNote(noteId) {
+    if (!noteId) return;
+
+    // Construct the sharing URL
+    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '').replace('settings.html', '');
+    const shareUrl = `${baseUrl}share.html?id=${noteId}`;
+
+    // Copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => {
+                ui.showSuccessMessage('Shareable link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy link: ', err);
+                ui.showSuccessMessage('Failed to copy link. Check console.');
+            });
+    } else {
+        // Fallback for browsers without Clipboard API
+        const textArea = document.createElement("textarea");
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            ui.showSuccessMessage('Shareable link copied to clipboard!');
+        } catch (err) {
+            console.error('Fallback copy failed: ', err);
+        }
+        document.body.removeChild(textArea);
+    }
 }

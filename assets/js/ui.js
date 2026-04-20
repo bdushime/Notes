@@ -17,8 +17,7 @@ export const elements = {
     titleInput: document.querySelector('.editor-title-input'),
     titleError: document.getElementById('title-error'),
     tagsInput: document.querySelector('.metadata-item input[placeholder="Add tags separated by commas"]'),
-    categorySelect: document.getElementById('note-category-select'),
-    contentInput: document.querySelector('.editor-textarea'),
+    contentInput: document.getElementById('note-content-editor'),
     timestampDisplay: document.querySelector('.timestamp'),
     saveBtn: document.querySelector('.btn-save, .editor-actions .btn-primary'),
 
@@ -137,6 +136,11 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
     container.innerHTML = notes.map(note => {
 
         const highlightedTitle = highlightText(note.title || 'Untitled', searchQuery);
+        
+        // Strip HTML for the preview snippet to avoid showing raw tags or breaking highlighting
+        const plainContent = stripHTML(note.content || '');
+        const preview = plainContent.substring(0, 70) + (plainContent.length > 70 ? '...' : '');
+        const highlightedPreview = highlightText(preview, searchQuery);
 
         return `
             <div class="note-item ${note.id === activeNoteId ? 'active' : ''}" 
@@ -152,6 +156,7 @@ export const renderNotesList = (notes, activeNoteId = null, searchQuery = "") =>
                     }).join('')}
                     ${note.category ? `<span class="category-badge">${note.category}</span>` : ''}
                 </div>
+                <p class="note-preview">${highlightedPreview}</p>
                 <div class="note-meta-row">
                     <span class="note-date">${formatDate(note.lastEdited)}</span>
                     ${note.location ? `<span class="location-badge">📍 Loc: ${note.location.lat.toFixed(2)}, ${note.location.lng.toFixed(2)}</span>` : ''}
@@ -198,7 +203,7 @@ export const populateEditor = (note = null) => {
     noteForm.dataset.editingId = note?.id || '';
     titleInput.value = note?.title || '';
     tagsInput.value = Array.isArray(note?.tags) ? note.tags.join(', ') : '';
-    contentInput.value = note?.content || '';
+    contentInput.innerHTML = note?.content || '';
     timestampDisplay.textContent = formatDate(note?.lastEdited);
     if (categorySelect) categorySelect.value = note?.category || '';
 
@@ -223,36 +228,12 @@ export const showValidationError = (input, message) => {
 export const clearValidation = (input) => input.setCustomValidity('');
 
 /**
- * Renders the sidebar categories navigation list.
- * @param {string[]} categories
- * @param {string|null} activeCategory
+ * Utility to strip HTML tags from a string for plain text previews.
+ * @param {string} html - The HTML string to strip.
+ * @returns {string} - Cleaned plain text.
  */
-export const renderCategoriesList = (categories, activeCategory = null) => {
-    const list = elements.sidebarCategoriesList;
-    if (!list) return;
-    if (!categories.length) {
-        list.innerHTML = `<li class="nav-item"><span class="nav-section-empty">No categories yet</span></li>`;
-        return;
-    }
-    list.innerHTML = categories.map(cat => `
-        <li class="nav-item">
-            <a href="#" class="nav-link ${cat === activeCategory ? 'active' : ''}" data-filter-category="${cat}">
-                <img src="./assets/images/icon-tag.svg" alt="" class="nav-icon" aria-hidden="true">
-                <span>${cat}</span>
-            </a>
-        </li>
-    `).join('');
-};
-
-/**
- * Rebuilds the category <select> dropdown options in the note editor.
- * @param {string[]} categories
- */
-export const renderCategoriesDropdown = (categories) => {
-    const select = elements.categorySelect;
-    if (!select) return;
-    const current = select.value;
-    select.innerHTML = `<option value="">No Category</option>` +
-        categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-    select.value = categories.includes(current) ? current : '';
+export const stripHTML = (html) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
 };
